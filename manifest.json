@@ -1,0 +1,18 @@
+{
+  "name": "NFC Phone Guard",
+  "short_name": "NFC Guard",
+  "description": "Anti-theft NFC alarm for your phone",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231d4ed8'/><text y='130' x='96' text-anchor='middle' font-size='110'>🛡️</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
