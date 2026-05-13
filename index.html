@@ -376,10 +376,47 @@ function checkPin() {
   }
 }
 
+// ── NFC loop ──────────────────────────────────────────────
+// NDEFReader.scan() stays alive but can silently die on some devices.
+// We restart it every 2 s to guarantee continuous polling.
+let scanLoopTimer = null;
+
+async function startNFCLoop() {
+  if (!armed) return;
+  try {
+    // Abort old reader if alive
+    try { nfcReader && nfcReader.abort && nfcReader.abort(); } catch(e) {}
+
+    nfcReader = new NDEFReader();
+
+    nfcReader.addEventListener('reading', (evt) => {
+      lastSeenTag = Date.now();
+      const serial = evt.serialNumber || 'tag';
+      if (!tagDetected) {
+        tagDetected = true;
+        setStatus('🔒 Armed — NFC locked in!', 'detected', '🛡️');
+        showAlert('✅ Tag detected (' + serial + '). Place card under phone and sleep!', 'ok');
+      }
+    });
+
+    nfcReader.addEventListener('readingerror', (err) => {
+      // ignore — we restart the loop anyway
+    });
+
+    await nfcReader.scan();
+
+  } catch(e) {
+    if (armed) showAlert('NFC error: ' + (e.message || e) + ' — retrying…', 'warn');
+  }
+
+  // Restart scan after 1.8 s to keep it alive
+  if (armed) scanLoopTimer = setTimeout(startNFCLoop, 1800);
+}
+
 // ── Arm / Disarm ─────────────────────────────────────────
 async function armAlarm() {
   if (!('NDEFReader' in window)) {
-    showAlert('NFC not supported in this browser. Use Chrome on Android.', 'err');
+    showAlert('NFC not supported. Open this page in Chrome on Android.', 'err');
     return;
   }
   if (!savedPin) {
@@ -392,36 +429,25 @@ async function armAlarm() {
   setStatus('Scanning for NFC tag…', 'scanning', '📡');
   hide('btn-arm'); show('btn-disarm');
   hide('how-to'); hide('pin-setup');
-  showAlert('Hold your NFC card/tag to the back of the phone…', 'warn');
+  showAlert('📲 Hold your NFC card to the BACK of the phone now…', 'warn');
 
-  try {
-    nfcReader = new NDEFReader();
-    await nfcReader.scan();
+  // Keep screen on
+  try { navigator.wakeLock && navigator.wakeLock.request('screen'); } catch(e) {}
 
-    nfcReader.addEventListener('reading', () => {
-      lastSeenTag = Date.now();
-      if (!tagDetected) {
-        tagDetected = true;
-        setStatus('🔒 Armed — NFC locked in!', 'detected', '🛡️');
-        showAlert('✅ NFC tag detected. Slide card under phone and sleep!', 'ok');
-      }
-    });
+  // Start looping NFC scan
+  await startNFCLoop();
 
-    // Poll: if armed + tag was seen + now missing → alarm
-    checkInterval = setInterval(() => {
-      if (!armed || !tagDetected) return;
-      if (Date.now() - lastSeenTag > 2500) startAlarm();
-    }, 400);
-
-  } catch(e) {
-    showAlert('Could not start NFC: ' + (e.message || e), 'err');
-    disarmAlarm();
-  }
+  // Poll: if tag was seen before but now missing → alarm
+  checkInterval = setInterval(() => {
+    if (!armed || !tagDetected || alarmActive) return;
+    if (Date.now() - lastSeenTag > 3000) startAlarm();
+  }, 500);
 }
 
 function disarmAlarm() {
   armed = false; tagDetected = false;
   clearInterval(checkInterval);
+  clearTimeout(scanLoopTimer);
   stopAlarm();
   try { nfcReader && nfcReader.abort && nfcReader.abort(); } catch(e) {}
   nfcReader = null;
