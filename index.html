@@ -318,27 +318,59 @@ function savePin() {
   setTimeout(hideAlert, 2000);
 }
 
-// ── Alarm sound ──────────────────────────────────────────
-function playBeep() {
+// ── Unlock audio on first tap ────────────────────────────
+let audioUnlocked = false;
+document.addEventListener('click', () => {
+  if (!audioUnlocked) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+      audioUnlocked = true;
+    } catch(e) {}
+  }
+});
+
+// ── Loud siren ───────────────────────────────────────────
+function playSiren() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const freqs = [880, 1100, 880, 1320, 880, 1100];
-    freqs.forEach((f, i) => {
-      const osc  = audioCtx.createOscillator();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const dur = 1.4;
+    [['sawtooth', 600, 1400, 0.7], ['square', 800, 1600, 0.3]].forEach(([type, lo, hi, vol]) => {
+      const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.type = 'square';
-      osc.frequency.value = f;
-      const t = audioCtx.currentTime + i * 0.18;
-      gain.gain.setValueAtTime(0.55, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-      osc.start(t);
-      osc.stop(t + 0.18);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(lo, now);
+      osc.frequency.linearRampToValueAtTime(hi, now + dur * 0.5);
+      osc.frequency.linearRampToValueAtTime(lo, now + dur);
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(vol, now + 0.05);
+      gain.gain.setValueAtTime(vol, now + dur - 0.05);
+      gain.gain.linearRampToValueAtTime(0, now + dur);
+      osc.start(now); osc.stop(now + dur);
     });
   } catch(e) {}
-  try { if (navigator.vibrate) navigator.vibrate([400, 100, 400, 100, 600]); } catch(e) {}
+  try { if (navigator.vibrate) navigator.vibrate([500, 150, 500, 150, 800]); } catch(e) {}
 }
+
+// ── Fullscreen + back button block ───────────────────────
+function requestFullscreen() {
+  try {
+    const el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
+  } catch(e) {}
+}
+function exitFullscreen() {
+  try { (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document); } catch(e) {}
+}
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', () => {
+  if (armed) history.pushState(null, '', location.href);
+});
 
 function startAlarm() {
   if (alarmActive) return;
@@ -346,16 +378,17 @@ function startAlarm() {
   setStatus('⚠ ALARM! Phone lifted!', 'alarm', '🚨');
   show('btn-stop'); hide('btn-disarm');
   showAlert('<strong>⚠ ALARM TRIGGERED!</strong> Someone lifted the phone!', 'err');
-  // Keep screen awake if possible
   try { navigator.wakeLock && navigator.wakeLock.request('screen'); } catch(e) {}
-  playBeep();
-  alarmInterval = setInterval(playBeep, 1500);
+  requestFullscreen();
+  playSiren();
+  alarmInterval = setInterval(playSiren, 1500);
 }
 
 function stopAlarm() {
   alarmActive = false;
   clearInterval(alarmInterval);
   try { if (navigator.vibrate) navigator.vibrate(0); } catch(e) {}
+  exitFullscreen();
 }
 
 // ── Disarm flow ──────────────────────────────────────────
