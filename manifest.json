@@ -1,18 +1,39 @@
 {
-  "name": "NFC Phone Guard",
-  "short_name": "NFC Guard",
-  "description": "Anti-theft NFC alarm for your phone",
-  "start_url": "/index.html",
+  "name": "NFC & Motion Phone Guard",
+  "short_name": "PhoneGuard",
+  "description": "Cross-platform anti-theft alarm with NFC, motion sensing, and biometric unlock",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "nfc-phone-guard-app",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
+  "categories": ["utilities", "security"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231d4ed8'/><text y='130' x='96' text-anchor='middle' font-size='110'>🛡️</text></svg>",
-      "sizes": "192x192",
+      "src": "icon.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

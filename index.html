@@ -2,43 +2,59 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NFC Guard">
-<title>NFC Phone Guard</title>
+<meta name="apple-mobile-web-app-title" content="PhoneGuard">
+<meta name="application-name" content="PhoneGuard">
+<meta name="description" content="Cross-platform anti-theft alarm with NFC, motion sensing, and biometric unlock">
+
+<title>NFC & Motion Phone Guard</title>
+
+<!-- Favicons & Touch Icons -->
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0f172a;
+    --bg: #0b1120;
     --bg2: #1e293b;
     --bg3: #334155;
-    --text: #f1f5f9;
+    --card-bg: rgba(30, 41, 59, 0.75);
+    --border: #334155;
+    --text: #f8fafc;
     --text2: #94a3b8;
     --text3: #64748b;
-    --border: #334155;
     --blue: #3b82f6;
     --blue-dark: #1d4ed8;
+    --blue-glow: rgba(59, 130, 246, 0.4);
     --green: #22c55e;
-    --green-dark: #15803d;
+    --green-glow: rgba(34, 197, 94, 0.4);
     --red: #ef4444;
-    --red-dark: #b91c1c;
+    --red-glow: rgba(239, 68, 68, 0.6);
     --amber: #f59e0b;
-    --radius: 16px;
-    --radius-sm: 10px;
+    --purple: #a855f7;
+    --radius: 18px;
+    --radius-sm: 12px;
   }
 
   html, body {
     height: 100%;
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     font-size: 16px;
     overflow-x: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
   body {
@@ -46,93 +62,194 @@
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    min-height: -webkit-fill-available;
+    padding: env(safe-area-inset-top, 16px) 16px env(safe-area-inset-bottom, 24px);
+    background: radial-gradient(circle at 50% 0%, #1e3a8a33 0%, var(--bg) 70%);
   }
 
   .app {
     width: 100%;
-    max-width: 420px;
-    padding: 1.5rem 1.25rem 2rem;
+    max-width: 440px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    min-height: 100vh;
+    gap: 1.1rem;
+    min-height: 100%;
+    padding-bottom: 2rem;
   }
 
   /* Header */
-  .header { text-align: center; padding-top: 0.5rem; }
-  .header .logo {
-    width: 56px; height: 56px;
-    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 0.75rem;
-    font-size: 28px;
+  .header {
+    text-align: center;
+    padding-top: 0.5rem;
+    position: relative;
   }
-  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-  .header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .header .logo-wrap {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    box-shadow: 0 8px 24px rgba(29, 78, 216, 0.35);
+  }
+  .header .logo-wrap img {
+    width: 44px;
+    height: 44px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .header .dev-badge {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
 
   /* Alert banner */
   .alert {
     border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1rem;
     font-size: 13px;
     font-weight: 500;
     display: none;
     line-height: 1.5;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
   }
-  .alert.show { display: block; }
-  .alert-err { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; }
-  .alert-ok  { background: #052e16; color: #86efac; border: 1px solid #14532d; }
-  .alert-warn{ background: #451a03; color: #fcd34d; border: 1px solid #78350f; }
+  .alert.show { display: block; animation: slideDown 0.3s ease; }
+  .alert-err { background: rgba(69, 10, 10, 0.9); color: #fca5a5; border: 1px solid #991b1b; }
+  .alert-ok  { background: rgba(5, 46, 22, 0.9); color: #86efac; border: 1px solid #166534; }
+  .alert-warn{ background: rgba(69, 26, 3, 0.9); color: #fcd34d; border: 1px solid #92400e; }
+  .alert-info{ background: rgba(15, 23, 42, 0.9); color: #93c5fd; border: 1px solid #1e40af; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mode Selector */
+  .mode-selector {
+    background: var(--bg2);
+    padding: 4px;
+    border-radius: 14px;
+    display: flex;
+    border: 1px solid var(--border);
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 9px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .mode-btn.active {
+    background: var(--blue-dark);
+    color: #ffffff;
+    box-shadow: 0 2px 10px var(--blue-glow);
+  }
 
   /* Status ring */
-  .ring-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 1.5rem 0; }
+  .ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.25rem 0;
+  }
   .ring {
-    width: 130px; height: 130px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    border: 3px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
+    border: 4px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    transition: border-color 0.4s;
+    transition: border-color 0.4s, box-shadow 0.4s;
+    background: radial-gradient(circle, rgba(30, 41, 59, 0.6) 0%, transparent 70%);
   }
   .ring::before {
     content: '';
     position: absolute;
-    inset: -8px;
+    inset: -9px;
     border-radius: 50%;
     border: 2px solid transparent;
     transition: border-color 0.4s;
   }
-  .ring.scanning { border-color: var(--blue); animation: pulse-blue 1.8s infinite; }
-  .ring.detected { border-color: var(--green); }
-  .ring.detected::before { border-color: #16a34a44; }
-  .ring.alarm { border-color: var(--red); animation: pulse-red 0.5s infinite; }
+  .ring.scanning {
+    border-color: var(--blue);
+    animation: pulse-blue 1.8s infinite;
+  }
+  .ring.detected, .ring.armed {
+    border-color: var(--green);
+    box-shadow: 0 0 24px var(--green-glow);
+  }
+  .ring.detected::before, .ring.armed::before {
+    border-color: rgba(34, 197, 94, 0.25);
+  }
+  .ring.alarm {
+    border-color: var(--red);
+    animation: pulse-red 0.5s infinite;
+  }
 
   @keyframes pulse-blue {
-    0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
-    50%      { box-shadow: 0 0 0 20px rgba(59,130,246,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    50%      { box-shadow: 0 0 0 22px rgba(59, 130, 246, 0); }
   }
   @keyframes pulse-red {
-    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-    50%      { box-shadow: 0 0 0 24px rgba(239,68,68,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50%      { box-shadow: 0 0 0 26px rgba(239, 68, 68, 0); }
   }
 
-  .ring-icon { font-size: 52px; line-height: 1; transition: all 0.3s; user-select: none; }
-  .status-label { font-size: 13px; color: var(--text2); }
-  .status-value { font-size: 17px; font-weight: 600; text-align: center; }
+  .ring-icon { font-size: 54px; line-height: 1; transition: all 0.3s; user-select: none; }
+  .status-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); font-weight: 700; }
+  .status-value { font-size: 18px; font-weight: 700; text-align: center; }
 
   /* Cards */
   .card {
-    background: var(--bg2);
+    background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1rem 1.125rem;
+    padding: 1.1rem;
+    backdrop-filter: blur(12px);
   }
-  .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 0.75rem; font-weight: 600; }
+  .card-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
   /* Steps */
-  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .steps { display: flex; flex-direction: column; gap: 9px; }
   .step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); line-height: 1.5; }
   .step-num {
     width: 22px; height: 22px; border-radius: 50%;
@@ -142,26 +259,25 @@
     flex-shrink: 0; margin-top: 1px;
   }
 
-  /* PIN */
-  .pin-group { display: flex; gap: 8px; align-items: center; }
-  .pin-group input {
+  /* PIN input */
+  .pin-row { display: flex; gap: 8px; align-items: center; }
+  .pin-field {
     flex: 1;
     background: var(--bg3);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     text-align: center;
-    letter-spacing: 6px;
-    padding: 10px 12px;
+    letter-spacing: 10px;
+    padding: 10px 14px;
     outline: none;
     -webkit-text-security: disc;
-    -moz-text-security: disc;
+    transition: border-color 0.2s;
   }
-  .pin-group input:focus { border-color: var(--blue); }
-  .pin-group input::placeholder { letter-spacing: 2px; font-size: 14px; font-weight: 400; color: var(--text3); }
-  input[type=number]::-webkit-inner-spin-button { display: none; }
+  .pin-field:focus { border-color: var(--blue); }
+  .pin-field::placeholder { letter-spacing: 2px; font-size: 14px; font-weight: 400; color: var(--text3); }
 
   /* Buttons */
   .btn {
@@ -172,127 +288,467 @@
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform 0.1s, opacity 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     letter-spacing: -0.2px;
   }
-  .btn:active { transform: scale(0.97); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-arm  { background: linear-gradient(135deg, #16a34a, #22c55e); color: white; }
-  .btn-stop { background: linear-gradient(135deg, #b91c1c, #ef4444); color: white; animation: throb 0.6s infinite; }
-  .btn-disarm { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-arm  {
+    background: linear-gradient(135deg, #15803d, #22c55e);
+    color: white;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35);
+  }
+  .btn-stop {
+    background: linear-gradient(135deg, #b91c1c, #ef4444);
+    color: white;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+    animation: throb 0.6s infinite;
+  }
+  .btn-disarm {
+    background: var(--bg2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-bio {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 18px rgba(139, 92, 246, 0.3);
+  }
+  .btn-sm {
+    width: auto;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: var(--radius-sm);
+  }
 
-  @keyframes throb { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+  @keyframes throb {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.02); }
+  }
 
   .hidden { display: none !important; }
 
-  /* Compat badge */
-  .compat {
-    font-size: 12px; color: var(--text3); text-align: center;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
-    margin-top: auto; padding-top: 1rem;
+  /* Biometric Setup Badge */
+  .bio-status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    margin-top: 10px;
+    font-size: 13px;
   }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); display: inline-block; }
-  .dot.ok { background: var(--green); }
-  .dot.bad { background: var(--red); }
+  .bio-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .bio-pill.ready { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+  .bio-pill.none  { background: #334155; color: #94a3b8; }
+
+  /* Compatibility bar */
+  .compat {
+    font-size: 12px;
+    color: var(--text3);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); display: inline-block; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 8px var(--green-glow); }
+  .dot.bad { background: var(--amber); }
+
+  /* ── LOCKDOWN MODAL / ALARM FULLSCREEN ─────────────────── */
+  .lockdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    animation: strobe 0.5s infinite;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+
+  @keyframes strobe {
+    0%, 100% { background-color: #7f1d1d; }
+    50%      { background-color: #000000; }
+  }
+
+  .lockdown-box {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid #ef4444;
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: 0 0 50px rgba(239, 68, 68, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .lockdown-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ef4444;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+  .lockdown-desc {
+    font-size: 13px;
+    color: #fca5a5;
+    line-height: 1.4;
+  }
+
+  /* PIN Display */
+  .pin-dots {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding: 8px 0;
+  }
+  .pin-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #64748b;
+    background: transparent;
+    transition: all 0.15s ease;
+  }
+  .pin-dot.filled {
+    background: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 0 10px #ef4444;
+  }
+
+  /* Numeric Keypad */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+  .key-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  .key-btn:active {
+    background: var(--blue-dark);
+    transform: scale(0.94);
+  }
+  .key-btn.action {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .key-btn.submit {
+    background: linear-gradient(135deg, #15803d, #22c55e);
+    color: #ffffff;
+  }
 </style>
 </head>
 <body>
+
 <div class="app">
 
+  <!-- Header -->
   <div class="header">
-    <div class="logo">🛡️</div>
-    <h1>NFC Phone Guard</h1>
-    <p>Anti-theft alarm for your dorm room</p>
-   <p>devloped by Bereketab Mihiretab</p>
+    <div class="logo-wrap">
+      <img src="icon.svg" alt="PhoneGuard Logo" width="44" height="44" />
+    </div>
+    <h1>NFC & Motion Guard</h1>
+    <p>Anti-theft alarm for dorms, cafes, and travel</p>
+    <span class="dev-badge">Developed by Bereketab Mihiretab • v2.0 Cross-Platform</span>
   </div>
 
+  <!-- Alert Banner -->
   <div id="alert" class="alert"></div>
 
-  <!-- Status ring -->
+  <!-- Mode Selector -->
+  <div class="mode-selector">
+    <button class="mode-btn active" id="mode-motion" onclick="setGuardMode('motion')">
+      <span>📱</span> Motion Guard
+    </button>
+    <button class="mode-btn" id="mode-nfc" onclick="setGuardMode('nfc')">
+      <span>📡</span> NFC Guard
+    </button>
+    <button class="mode-btn" id="mode-dual" onclick="setGuardMode('dual')">
+      <span>🛡️</span> Dual (NFC+Motion)
+    </button>
+  </div>
+
+  <!-- Status Ring -->
   <div class="ring-wrap">
     <div class="ring idle" id="ring">
-      <div class="ring-icon" id="ring-icon">📡</div>
+      <div class="ring-icon" id="ring-icon">🛡️</div>
     </div>
     <div class="status-label">Status</div>
     <div class="status-value" id="status-text">Ready to arm</div>
   </div>
 
   <!-- How to use -->
-  <div class="card" id="how-to">
-    <div class="card-title">How to use</div>
-    <div class="steps">
-      <div class="step"><span class="step-num">1</span><span>Get any NFC card — transit card, hotel key, or cheap NFC sticker</span></div>
-      <div class="step"><span class="step-num">2</span><span>Set your 4-digit disarm PIN below</span></div>
-      <div class="step"><span class="step-num">3</span><span>Tap <strong>Arm Alarm</strong>, hold card near phone back until locked</span></div>
-      <div class="step"><span class="step-num">4</span><span>Slide phone over card and sleep — alarm fires if lifted</span></div>
+  <div class="card" id="how-to-card">
+    <div class="card-title">
+      <span>How to use (<span id="mode-label-text">Motion Guard</span>)</span>
+    </div>
+    <div class="steps" id="steps-container">
+      <!-- Steps rendered dynamically based on mode -->
     </div>
   </div>
 
-  <!-- PIN setup -->
-  <div class="card" id="pin-setup">
-    <div class="card-title">Disarm PIN</div>
-    <div class="pin-group">
-      <input type="number" id="pin-input" placeholder="4 digits" maxlength="4" inputmode="numeric" />
-      <button class="btn btn-disarm" style="width:auto; padding:10px 18px; font-size:14px;" onclick="savePin()">Save</button>
+  <!-- PIN & Biometric Setup -->
+  <div class="card" id="security-card">
+    <div class="card-title">Security & Disarm Methods</div>
+    
+    <!-- 4-digit PIN -->
+    <div class="pin-row">
+      <input type="password" id="pin-input" placeholder="Set 4-digit PIN" maxlength="4" inputmode="numeric" class="pin-field" />
+      <button class="btn btn-disarm btn-sm" onclick="savePin()">Save PIN</button>
+    </div>
+
+    <!-- Biometric enrollment badge -->
+    <div class="bio-status-badge">
+      <div>
+        <div style="font-weight:600;">Biometrics (Face ID / Fingerprint)</div>
+        <div style="font-size:12px; color:var(--text3);" id="bio-desc">Check support...</div>
+      </div>
+      <button class="btn btn-bio btn-sm" id="btn-bio-enroll" onclick="enrollBiometrics()">Enable</button>
     </div>
   </div>
 
   <!-- Action buttons -->
   <button class="btn btn-arm" id="btn-arm" onclick="armAlarm()">🔒 Arm Alarm</button>
-  <button class="btn btn-disarm hidden" id="btn-disarm" onclick="promptDisarm()">🔓 Disarm</button>
-  <button class="btn btn-stop hidden" id="btn-stop" onclick="promptDisarm()">🔕 STOP ALARM — Enter PIN</button>
+  <button class="btn btn-disarm hidden" id="btn-disarm" onclick="promptDisarm()">🔓 Disarm Alarm</button>
 
-  <!-- PIN check (shown when disarming) -->
-  <div class="card hidden" id="pin-check-card">
-    <div class="card-title">Enter PIN to disarm</div>
-    <div class="pin-group">
-      <input type="number" id="pin-check" placeholder="Enter PIN" inputmode="numeric" onkeydown="if(event.key==='Enter')checkPin()" />
-      <button class="btn btn-stop" style="width:auto;padding:10px 18px;font-size:14px;animation:none" onclick="checkPin()">OK</button>
-    </div>
+  <!-- Sound Test -->
+  <div style="text-align: center; margin-top: -4px;">
+    <button style="background:none; border:none; color:var(--text3); font-size:13px; text-decoration:underline; cursor:pointer;" onclick="testSiren()">
+      🔊 Test alarm siren (2 seconds)
+    </button>
   </div>
 
-  <!-- Compat info -->
+  <!-- Compatibility bar -->
   <div class="compat" id="compat-info">
     <span class="dot" id="compat-dot"></span>
-    <span id="compat-text">Checking NFC support...</span>
+    <span id="compat-text">Checking device sensors...</span>
   </div>
 
 </div>
 
+<!-- ── LOCKDOWN OVERLAY (Shown when alarm triggers) ──────── -->
+<div id="lockdown-overlay" class="lockdown-overlay hidden">
+  <div class="lockdown-box">
+    <div class="lockdown-title">🚨 THEFT ALARM TRIGGERED!</div>
+    <div class="lockdown-desc">The phone was lifted or moved! Disarm immediately with Biometrics or PIN:</div>
+
+    <!-- Quick Biometric Disarm Button -->
+    <button class="btn btn-bio" id="btn-lockdown-bio" onclick="disarmWithBiometrics()">
+      <span>🧬</span> Disarm with Face ID / Fingerprint
+    </button>
+
+    <!-- PIN Dots indicator -->
+    <div class="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+
+    <!-- On-screen Numeric Keypad -->
+    <div class="keypad">
+      <button class="key-btn" onclick="pressKey('1')">1</button>
+      <button class="key-btn" onclick="pressKey('2')">2</button>
+      <button class="key-btn" onclick="pressKey('3')">3</button>
+      <button class="key-btn" onclick="pressKey('4')">4</button>
+      <button class="key-btn" onclick="pressKey('5')">5</button>
+      <button class="key-btn" onclick="pressKey('6')">6</button>
+      <button class="key-btn" onclick="pressKey('7')">7</button>
+      <button class="key-btn" onclick="pressKey('8')">8</button>
+      <button class="key-btn" onclick="pressKey('9')">9</button>
+      <button class="key-btn action" onclick="pressKey('C')">Clear</button>
+      <button class="key-btn" onclick="pressKey('0')">0</button>
+      <button class="key-btn action" onclick="pressKey('DEL')">⌫</button>
+    </div>
+
+    <div id="lockdown-error" style="color:#fca5a5; font-size:13px; font-weight:700; min-height:18px;"></div>
+  </div>
+</div>
+
 <script>
-// ── Register service worker ──────────────────────────────
+// ── 1. Register Service Worker ──────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('./sw.js').catch(err => {
+    console.warn('SW registration failed:', err);
+  });
 }
 
-// ── State ────────────────────────────────────────────────
-let armed = false, alarmActive = false;
-let tagDetected = false, lastSeenTag = 0;
+// ── 2. State & Storage ──────────────────────────────────────
+let guardMode = 'motion'; // 'motion' | 'nfc' | 'dual'
+let armed = false;
+let armingTimer = null;
+let alarmActive = false;
 let savedPin = localStorage.getItem('nfc_guard_pin') || null;
-let nfcReader = null, checkInterval = null, alarmInterval = null;
+let savedBioCredId = localStorage.getItem('nfc_guard_bio_id') || null;
+
+// Hardware references
+let nfcController = null;
+let nfcReadingActive = false;
+let lastSeenTagTime = 0;
+let checkInterval = null;
+let alarmInterval = null;
+let audioWatchdog = null;
+let wakeLockSentinel = null;
 let audioCtx = null;
 
-// Restore saved PIN display
+// Motion Baseline
+let motionBaseline = null;
+let motionThreshold = 2.8; // m/s^2 delta sensitivity
+let motionListener = null;
+
+// Keypad Buffer
+let currentPinBuffer = '';
+let failedAttempts = 0;
+let lockoutUntil = 0;
+
+// Restore saved PIN
 if (savedPin) {
   document.getElementById('pin-input').value = savedPin;
 }
 
-// ── Compat check ─────────────────────────────────────────
-(function() {
-  const dot  = document.getElementById('compat-dot');
-  const text = document.getElementById('compat-text');
-  if ('NDEFReader' in window) {
-    dot.className = 'dot ok';
-    text.textContent = 'NFC supported — ready';
+// ── 3. Capability Checks ────────────────────────────────────
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const hasNFC = 'NDEFReader' in window;
+const hasMotion = 'DeviceMotionEvent' in window;
+const hasWebAuthn = window.PublicKeyCredential && 
+                    typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
+
+// Initialize Mode & Diagnostics
+(async function init() {
+  const compatDot = document.getElementById('compat-dot');
+  const compatText = document.getElementById('compat-text');
+
+  // If iOS or browser lacks NFC, default to Motion Guard
+  if (!hasNFC) {
+    document.getElementById('mode-nfc').style.display = 'none';
+    document.getElementById('mode-dual').style.display = 'none';
+    setGuardMode('motion');
+    compatDot.className = 'dot ok';
+    compatText.textContent = isIOS ? 'iOS Safari: Motion Guard active (Face ID / PIN ready)' : 'Motion Guard active';
   } else {
-    dot.className = 'dot bad';
-    text.textContent = 'NFC not supported. Use Chrome on Android.';
+    compatDot.className = 'dot ok';
+    compatText.textContent = 'Full Hardware Support: NFC + Motion + Biometrics';
   }
+
+  // Check Biometrics (Face ID / Touch ID / Android Fingerprint)
+  await checkBiometricsSupport();
+  updateInstructions();
 })();
 
-// ── Helpers ──────────────────────────────────────────────
-function showAlert(msg, type) {
+async function checkBiometricsSupport() {
+  const bioDesc = document.getElementById('bio-desc');
+  const bioEnrollBtn = document.getElementById('btn-bio-enroll');
+  const lockdownBioBtn = document.getElementById('btn-lockdown-bio');
+
+  if (!hasWebAuthn) {
+    bioDesc.textContent = 'Not supported on this browser';
+    bioEnrollBtn.disabled = true;
+    lockdownBioBtn.style.display = 'none';
+    return;
+  }
+
+  try {
+    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if (available) {
+      if (savedBioCredId) {
+        bioDesc.textContent = isIOS ? 'Face ID / Touch ID Enrolled ✅' : 'Biometric Enrolled ✅';
+        bioEnrollBtn.textContent = 'Re-enroll';
+        lockdownBioBtn.style.display = 'flex';
+      } else {
+        bioDesc.textContent = isIOS ? 'Face ID / Touch ID available' : 'Fingerprint / Face available';
+        bioEnrollBtn.textContent = 'Enable';
+        lockdownBioBtn.style.display = 'none';
+      }
+    } else {
+      bioDesc.textContent = 'No biometric sensor detected';
+      bioEnrollBtn.disabled = true;
+      lockdownBioBtn.style.display = 'none';
+    }
+  } catch (e) {
+    bioDesc.textContent = 'Biometric setup ready over HTTPS';
+  }
+}
+
+// ── 4. Guard Mode Handling ──────────────────────────────────
+function setGuardMode(mode) {
+  if (armed) return;
+  guardMode = mode;
+  ['motion', 'nfc', 'dual'].forEach(m => {
+    const btn = document.getElementById('mode-' + m);
+    if (btn) btn.classList.toggle('active', m === mode);
+  });
+  updateInstructions();
+}
+
+function updateInstructions() {
+  const container = document.getElementById('steps-container');
+  const modeLabel = document.getElementById('mode-label-text');
+  
+  if (guardMode === 'motion') {
+    modeLabel.textContent = 'Universal Motion Guard';
+    container.innerHTML = `
+      <div class="step"><span class="step-num">1</span><span>Set your 4-digit PIN below (or enable Biometrics).</span></div>
+      <div class="step"><span class="step-num">2</span><span>Tap <strong>Arm Alarm</strong> — a 5-second countdown begins.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Place your phone flat on your desk, nightstand, or laptop.</span></div>
+      <div class="step"><span class="step-num">4</span><span>If anyone lifts, tilts, or moves the phone, the siren fires immediately!</span></div>
+    `;
+  } else if (guardMode === 'nfc') {
+    modeLabel.textContent = 'NFC Tag Guard';
+    container.innerHTML = `
+      <div class="step"><span class="step-num">1</span><span>Set your 4-digit PIN below.</span></div>
+      <div class="step"><span class="step-num">2</span><span>Tap <strong>Arm Alarm</strong> and hold an NFC card/tag against the back of the phone.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Leave the phone resting on the card and rest easily.</span></div>
+      <div class="step"><span class="step-num">4</span><span>If lifted away from the tag, the siren triggers!</span></div>
+    `;
+  } else {
+    modeLabel.textContent = 'Dual Guard (NFC + Motion)';
+    container.innerHTML = `
+      <div class="step"><span class="step-num">1</span><span>Locks phone with both NFC proximity AND motion sensor.</span></div>
+      <div class="step"><span class="step-num">2</span><span>Place phone on NFC card during 5s arming countdown.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Alarm triggers if the card is removed OR if the phone is picked up!</span></div>
+    `;
+  }
+}
+
+// ── 5. PIN & Biometrics Management ──────────────────────────
+function showAlert(msg, type = 'info') {
   const el = document.getElementById('alert');
   el.className = 'alert show alert-' + type;
   el.innerHTML = msg;
@@ -300,197 +756,563 @@ function showAlert(msg, type) {
 function hideAlert() {
   document.getElementById('alert').className = 'alert';
 }
+
+function savePin() {
+  const val = document.getElementById('pin-input').value.trim();
+  if (!val || val.length !== 4 || !/^\d{4}$/.test(val)) {
+    showAlert('Please enter an exact 4-digit numeric PIN.', 'err');
+    return;
+  }
+  savedPin = val;
+  localStorage.setItem('nfc_guard_pin', val);
+  showAlert('✅ 4-Digit Disarm PIN saved successfully!', 'ok');
+  setTimeout(hideAlert, 2500);
+}
+
+// Biometric Helpers
+function bufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+function base64ToBuffer(base64) {
+  const binary = window.atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function enrollBiometrics() {
+  if (!window.isSecureContext) {
+    showAlert('Biometrics requires HTTPS (or localhost).', 'err');
+    return;
+  }
+  try {
+    const challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    const userId = new Uint8Array(16);
+    window.crypto.getRandomValues(userId);
+
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge: challenge,
+        rp: { name: "NFC Phone Guard", id: window.location.hostname || "localhost" },
+        user: {
+          id: userId,
+          name: "phone-owner",
+          displayName: "Phone Owner"
+        },
+        pubKeyCredParams: [
+          { alg: -7, type: "public-key" },   // ES256
+          { alg: -257, type: "public-key" }  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: "platform",
+          userVerification: "required"
+        },
+        timeout: 60000
+      }
+    });
+
+    if (credential) {
+      savedBioCredId = bufferToBase64(credential.rawId);
+      localStorage.setItem('nfc_guard_bio_id', savedBioCredId);
+      showAlert('✅ Biometrics enrolled! Face ID / Touch ID can now disarm the alarm.', 'ok');
+      checkBiometricsSupport();
+      setTimeout(hideAlert, 3000);
+    }
+  } catch (err) {
+    console.error('Biometric enrollment error:', err);
+    showAlert('Biometric enrollment cancelled or not allowed: ' + (err.message || err), 'err');
+  }
+}
+
+async function disarmWithBiometrics() {
+  if (!savedBioCredId) {
+    showLockdownError('No biometrics enrolled. Please enter PIN.');
+    return;
+  }
+  try {
+    const challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge: challenge,
+        rpId: window.location.hostname || "localhost",
+        allowCredentials: [{
+          id: base64ToBuffer(savedBioCredId),
+          type: "public-key"
+        }],
+        userVerification: "required",
+        timeout: 60000
+      }
+    });
+
+    if (assertion) {
+      disarmAlarm();
+    }
+  } catch (err) {
+    console.error('Biometric assertion failed:', err);
+    showLockdownError('Biometric verification failed. Use PIN.');
+  }
+}
+
+// ── 6. Audio Synthesizer & Watchdog ─────────────────────────
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('touchstart', initAudio, { once: true });
+
+function playSiren() {
+  try {
+    initAudio();
+    const now = audioCtx.currentTime;
+    const dur = 1.3;
+
+    // Dual-tone dissonant siren
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'square';
+
+    // Frequency sweep
+    const lo = 750, hi = 1550;
+    osc1.frequency.setValueAtTime(lo, now);
+    osc1.frequency.linearRampToValueAtTime(hi, now + dur * 0.5);
+    osc1.frequency.linearRampToValueAtTime(lo, now + dur);
+
+    osc2.frequency.setValueAtTime(lo * 1.2, now);
+    osc2.frequency.linearRampToValueAtTime(hi * 1.2, now + dur * 0.5);
+    osc2.frequency.linearRampToValueAtTime(lo * 1.2, now + dur);
+
+    // Max volume envelope
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(1.0, now + 0.05);
+    gain.gain.setValueAtTime(1.0, now + dur - 0.05);
+    gain.gain.linearRampToValueAtTime(0.01, now + dur);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + dur);
+    osc2.stop(now + dur);
+
+  } catch (e) {
+    console.error('Audio play error:', e);
+  }
+
+  // Violent Vibration
+  try {
+    if (navigator.vibrate) {
+      navigator.vibrate([800, 150, 800, 150, 1000]);
+    }
+  } catch (e) {}
+}
+
+function testSiren() {
+  initAudio();
+  playSiren();
+  showAlert('🔊 Playing siren test for 2 seconds...', 'info');
+  setTimeout(hideAlert, 2500);
+}
+
+// ── 7. Screen Wake Lock & Fullscreen Lockdown ───────────────
+async function acquireWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+    }
+  } catch (e) {}
+}
+
+function releaseWakeLock() {
+  try {
+    if (wakeLockSentinel) {
+      wakeLockSentinel.release();
+      wakeLockSentinel = null;
+    }
+  } catch (e) {}
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && (armed || alarmActive)) {
+    acquireWakeLock();
+    if (alarmActive && audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+});
+
+// Trapping Back Button and Gestures
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', () => {
+  if (armed || alarmActive) {
+    history.pushState(null, '', location.href);
+  }
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (armed || alarmActive) {
+    e.preventDefault();
+    e.returnValue = 'ALARM IS ACTIVE!';
+    return e.returnValue;
+  }
+});
+
+window.addEventListener('contextmenu', (e) => {
+  if (alarmActive) e.preventDefault();
+});
+
+function requestFullscreenSafe() {
+  try {
+    const el = document.documentElement;
+    const rfs = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (rfs) rfs.call(el).catch(() => {});
+  } catch (e) {}
+}
+
+function exitFullscreenSafe() {
+  try {
+    const efs = document.exitFullscreen || document.webkitExitFullscreen;
+    if (efs && document.fullscreenElement) efs.call(document).catch(() => {});
+  } catch (e) {}
+}
+
+// ── 8. ALARM TRIGGER & LOCKDOWN ─────────────────────────────
+function startAlarm(reason = 'Motion or tag moved!') {
+  if (alarmActive) return;
+  alarmActive = true;
+
+  setStatus('🚨 ALARM TRIGGERED! 🚨', 'alarm', '🚨');
+  document.getElementById('lockdown-overlay').classList.remove('hidden');
+
+  requestFullscreenSafe();
+  acquireWakeLock();
+  initAudio();
+  playSiren();
+
+  // Continuous watchdog siren loop (fires every 1.35s)
+  alarmInterval = setInterval(playSiren, 1350);
+
+  // Audio Context recovery watchdog
+  audioWatchdog = setInterval(() => {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }, 300);
+
+  // If biometrics enrolled, prompt immediately
+  if (savedBioCredId) {
+    setTimeout(disarmWithBiometrics, 400);
+  }
+}
+
+function stopAlarm() {
+  alarmActive = false;
+  clearInterval(alarmInterval);
+  clearInterval(audioWatchdog);
+  alarmInterval = null;
+  audioWatchdog = null;
+
+  try {
+    if (navigator.vibrate) navigator.vibrate(0);
+  } catch (e) {}
+
+  document.getElementById('lockdown-overlay').classList.add('hidden');
+  resetKeypad();
+  exitFullscreenSafe();
+}
+
+// ── 9. Motion Sensor Logic ──────────────────────────────────
+async function enableMotionDetection() {
+  // iOS 13+ permission request
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const permission = await DeviceMotionEvent.requestPermission();
+      if (permission !== 'granted') {
+        showAlert('Motion permission denied. Cannot guard without sensor access.', 'err');
+        return false;
+      }
+    } catch (err) {
+      showAlert('Motion sensor permission error: ' + err.message, 'err');
+      return false;
+    }
+  }
+
+  motionBaseline = null;
+  let samplesCollected = 0;
+  let accSum = { x: 0, y: 0, z: 0 };
+
+  motionListener = (event) => {
+    if (!armed) return;
+    const acc = event.accelerationIncludingGravity || event.acceleration;
+    if (!acc) return;
+
+    const x = acc.x || 0, y = acc.y || 0, z = acc.z || 0;
+
+    // Collect baseline gravity vector for first 10 samples
+    if (samplesCollected < 10) {
+      accSum.x += x; accSum.y += y; accSum.z += z;
+      samplesCollected++;
+      if (samplesCollected === 10) {
+        motionBaseline = {
+          x: accSum.x / 10,
+          y: accSum.y / 10,
+          z: accSum.z / 10
+        };
+      }
+      return;
+    }
+
+    if (!motionBaseline) return;
+
+    // Calculate delta acceleration from baseline
+    const dx = x - motionBaseline.x;
+    const dy = y - motionBaseline.y;
+    const dz = z - motionBaseline.z;
+    const delta = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+    // If movement exceeds sensitivity threshold -> Trigger Alarm
+    if (delta > motionThreshold) {
+      console.warn('Motion triggered with delta:', delta);
+      startAlarm('Phone moved or lifted!');
+    }
+  };
+
+  window.addEventListener('devicemotion', motionListener, true);
+  return true;
+}
+
+function disableMotionDetection() {
+  if (motionListener) {
+    window.removeEventListener('devicemotion', motionListener, true);
+    motionListener = null;
+  }
+  motionBaseline = null;
+}
+
+// ── 10. Web NFC Logic (Proper AbortController) ──────────────
+async function enableNFC() {
+  if (!('NDEFReader' in window)) return false;
+  try {
+    if (nfcController) nfcController.abort();
+    nfcController = new AbortController();
+
+    const ndef = new NDEFReader();
+    await ndef.scan({ signal: nfcController.signal });
+
+    nfcReadingActive = true;
+    lastSeenTagTime = Date.now();
+
+    ndef.addEventListener('reading', (evt) => {
+      lastSeenTagTime = Date.now();
+      const serial = evt.serialNumber || 'tag';
+      setStatus('🔒 Armed & Locked on NFC Tag', 'detected', '🛡️');
+      showAlert('✅ NFC Tag locked in (' + serial + '). Place phone down and sleep!', 'ok');
+    });
+
+    // Check interval: if NFC-only mode, detects if tag was removed
+    if (guardMode === 'nfc') {
+      checkInterval = setInterval(() => {
+        if (!armed || alarmActive) return;
+        // If tag hasn't been read in 5 seconds
+        if (lastSeenTagTime > 0 && Date.now() - lastSeenTagTime > 5000) {
+          startAlarm('NFC tag disconnected or phone lifted!');
+        }
+      }, 1000);
+    }
+
+    return true;
+  } catch (err) {
+    console.error('NFC Scan failed:', err);
+    showAlert('NFC Scan error: ' + (err.message || err), 'warn');
+    return false;
+  }
+}
+
+function disableNFC() {
+  if (nfcController) {
+    try { nfcController.abort(); } catch (e) {}
+    nfcController = null;
+  }
+  if (checkInterval) {
+    clearInterval(checkInterval);
+    checkInterval = null;
+  }
+  nfcReadingActive = false;
+  lastSeenTagTime = 0;
+}
+
+// ── 11. Arm / Disarm Flow ───────────────────────────────────
 function setStatus(text, ringClass, icon) {
   document.getElementById('status-text').textContent = text;
   const ring = document.getElementById('ring');
   ring.className = 'ring ' + ringClass;
   document.getElementById('ring-icon').textContent = icon;
 }
-function show(id) { document.getElementById(id).classList.remove('hidden'); }
-function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
-// ── PIN ──────────────────────────────────────────────────
-function savePin() {
-  const v = document.getElementById('pin-input').value.trim();
-  if (!v || v.length < 4) { showAlert('Please enter a 4-digit PIN.', 'err'); return; }
-  savedPin = v;
-  localStorage.setItem('nfc_guard_pin', v);
-  showAlert('✅ PIN saved!', 'ok');
-  setTimeout(hideAlert, 2000);
-}
-
-// ── Unlock audio on first tap ────────────────────────────
-let audioUnlocked = false;
-document.addEventListener('click', () => {
-  if (!audioUnlocked) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const buf = audioCtx.createBuffer(1, 1, 22050);
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
-      audioUnlocked = true;
-    } catch(e) {}
-  }
-});
-
-// ── Loud siren ───────────────────────────────────────────
-function playSiren() {
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const now = audioCtx.currentTime;
-    const dur = 1.4;
-    [['sawtooth', 600, 1400, 0.7], ['square', 800, 1600, 0.3]].forEach(([type, lo, hi, vol]) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.type = type;
-      osc.frequency.setValueAtTime(lo, now);
-      osc.frequency.linearRampToValueAtTime(hi, now + dur * 0.5);
-      osc.frequency.linearRampToValueAtTime(lo, now + dur);
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(vol, now + 0.05);
-      gain.gain.setValueAtTime(vol, now + dur - 0.05);
-      gain.gain.linearRampToValueAtTime(0, now + dur);
-      osc.start(now); osc.stop(now + dur);
-    });
-  } catch(e) {}
-  try { if (navigator.vibrate) navigator.vibrate([500, 150, 500, 150, 800]); } catch(e) {}
-}
-
-// ── Fullscreen + back button block ───────────────────────
-function requestFullscreen() {
-  try {
-    const el = document.documentElement;
-    (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
-  } catch(e) {}
-}
-function exitFullscreen() {
-  try { (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document); } catch(e) {}
-}
-history.pushState(null, '', location.href);
-window.addEventListener('popstate', () => {
-  if (armed) history.pushState(null, '', location.href);
-});
-
-function startAlarm() {
-  if (alarmActive) return;
-  alarmActive = true;
-  setStatus('⚠ ALARM! Phone lifted!', 'alarm', '🚨');
-  show('btn-stop'); hide('btn-disarm');
-  showAlert('<strong>⚠ ALARM TRIGGERED!</strong> Someone lifted the phone!', 'err');
-  try { navigator.wakeLock && navigator.wakeLock.request('screen'); } catch(e) {}
-  requestFullscreen();
-  playSiren();
-  alarmInterval = setInterval(playSiren, 1500);
-}
-
-function stopAlarm() {
-  alarmActive = false;
-  clearInterval(alarmInterval);
-  try { if (navigator.vibrate) navigator.vibrate(0); } catch(e) {}
-  exitFullscreen();
-}
-
-// ── Disarm flow ──────────────────────────────────────────
-function promptDisarm() {
-  show('pin-check-card');
-  document.getElementById('pin-check').focus();
-}
-
-function checkPin() {
-  const entered = document.getElementById('pin-check').value.trim();
-  document.getElementById('pin-check').value = '';
-  if (!savedPin || entered === savedPin) {
-    hide('pin-check-card');
-    disarmAlarm();
-  } else {
-    showAlert('❌ Wrong PIN. Try again.', 'err');
-    try { if (navigator.vibrate) navigator.vibrate(200); } catch(e) {}
-  }
-}
-
-// ── NFC loop ──────────────────────────────────────────────
-// NDEFReader.scan() stays alive but can silently die on some devices.
-// We restart it every 2 s to guarantee continuous polling.
-let scanLoopTimer = null;
-
-async function startNFCLoop() {
-  if (!armed) return;
-  try {
-    // Abort old reader if alive
-    try { nfcReader && nfcReader.abort && nfcReader.abort(); } catch(e) {}
-
-    nfcReader = new NDEFReader();
-
-    nfcReader.addEventListener('reading', (evt) => {
-      lastSeenTag = Date.now();
-      const serial = evt.serialNumber || 'tag';
-      if (!tagDetected) {
-        tagDetected = true;
-        setStatus('🔒 Armed — NFC locked in!', 'detected', '🛡️');
-        showAlert('✅ Tag detected (' + serial + '). Place card under phone and sleep!', 'ok');
-      }
-    });
-
-    nfcReader.addEventListener('readingerror', (err) => {
-      // ignore — we restart the loop anyway
-    });
-
-    await nfcReader.scan();
-
-  } catch(e) {
-    if (armed) showAlert('NFC error: ' + (e.message || e) + ' — retrying…', 'warn');
-  }
-
-  // Restart scan after 1.8 s to keep it alive
-  if (armed) scanLoopTimer = setTimeout(startNFCLoop, 1800);
-}
-
-// ── Arm / Disarm ─────────────────────────────────────────
 async function armAlarm() {
-  if (!('NDEFReader' in window)) {
-    showAlert('NFC not supported. Open this page in Chrome on Android.', 'err');
-    return;
-  }
-  if (!savedPin) {
-    showAlert('Please set and save a PIN first!', 'warn');
+  if (!savedPin && !savedBioCredId) {
+    showAlert('Please save a 4-digit PIN first for emergency disarm!', 'warn');
     document.getElementById('pin-input').focus();
     return;
   }
+
+  initAudio();
   hideAlert();
-  armed = true; tagDetected = false; lastSeenTag = 0;
-  setStatus('Scanning for NFC tag…', 'scanning', '📡');
-  hide('btn-arm'); show('btn-disarm');
-  hide('how-to'); hide('pin-setup');
-  showAlert('📲 Hold your NFC card to the BACK of the phone now…', 'warn');
 
-  // Keep screen on
-  try { navigator.wakeLock && navigator.wakeLock.request('screen'); } catch(e) {}
+  // 5-second arming countdown
+  let countdown = 5;
+  setStatus(`Arming in ${countdown}s... Place phone down!`, 'scanning', '⏳');
+  document.getElementById('btn-arm').classList.add('hidden');
+  document.getElementById('btn-disarm').classList.remove('hidden');
 
-  // Start looping NFC scan
-  await startNFCLoop();
+  armingTimer = setInterval(async () => {
+    countdown--;
+    if (countdown > 0) {
+      setStatus(`Arming in ${countdown}s... Place phone down!`, 'scanning', '⏳');
+    } else {
+      clearInterval(armingTimer);
+      armingTimer = null;
+      await activateGuard();
+    }
+  }, 1000);
+}
 
-  // Poll: if tag was seen before but now missing → alarm
-  checkInterval = setInterval(() => {
-    if (!armed || !tagDetected || alarmActive) return;
-    if (Date.now() - lastSeenTag > 3000) startAlarm();
-  }, 500);
+async function activateGuard() {
+  armed = true;
+  acquireWakeLock();
+  setStatus('🛡️ ARMED & GUARDING', 'armed', '🛡️');
+  showAlert('✅ Guard armed! Any movement or tampering will trigger the siren.', 'ok');
+  setTimeout(hideAlert, 3000);
+
+  if (guardMode === 'motion' || guardMode === 'dual') {
+    await enableMotionDetection();
+  }
+  if (guardMode === 'nfc' || guardMode === 'dual') {
+    await enableNFC();
+  }
+}
+
+function promptDisarm() {
+  document.getElementById('lockdown-overlay').classList.remove('hidden');
+  resetKeypad();
+  if (savedBioCredId) {
+    disarmWithBiometrics();
+  }
 }
 
 function disarmAlarm() {
-  armed = false; tagDetected = false;
-  clearInterval(checkInterval);
-  clearTimeout(scanLoopTimer);
+  armed = false;
+  if (armingTimer) {
+    clearInterval(armingTimer);
+    armingTimer = null;
+  }
+  disableMotionDetection();
+  disableNFC();
   stopAlarm();
-  try { nfcReader && nfcReader.abort && nfcReader.abort(); } catch(e) {}
-  nfcReader = null;
-  setStatus('Ready to arm', 'idle', '📡');
-  hide('btn-disarm'); hide('btn-stop'); show('btn-arm');
-  hide('pin-check-card');
-  show('how-to'); show('pin-setup');
-  hideAlert();
+  releaseWakeLock();
+
+  setStatus('Ready to arm', 'idle', '🛡️');
+  document.getElementById('btn-arm').classList.remove('hidden');
+  document.getElementById('btn-disarm').classList.add('hidden');
+  showAlert('🔓 Alarm successfully disarmed with authorization.', 'ok');
+  setTimeout(hideAlert, 3000);
 }
+
+// ── 12. On-screen Security Keypad ───────────────────────────
+function pressKey(k) {
+  if (Date.now() < lockoutUntil) {
+    showLockdownError(`Locked out! Wait ${Math.ceil((lockoutUntil - Date.now()) / 1000)}s`);
+    return;
+  }
+
+  if (k === 'C') {
+    currentPinBuffer = '';
+  } else if (k === 'DEL') {
+    currentPinBuffer = currentPinBuffer.slice(0, -1);
+  } else if (/^\d$/.test(k)) {
+    if (currentPinBuffer.length < 4) {
+      currentPinBuffer += k;
+    }
+  }
+
+  updatePinDots();
+
+  if (currentPinBuffer.length === 4) {
+    setTimeout(verifyPinAttempt, 150);
+  }
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (dot) {
+      dot.classList.toggle('filled', i < currentPinBuffer.length);
+    }
+  }
+}
+
+function resetKeypad() {
+  currentPinBuffer = '';
+  updatePinDots();
+  document.getElementById('lockdown-error').textContent = '';
+}
+
+function showLockdownError(msg) {
+  const errEl = document.getElementById('lockdown-error');
+  errEl.textContent = msg;
+  try { if (navigator.vibrate) navigator.vibrate(200); } catch (e) {}
+}
+
+function verifyPinAttempt() {
+  if (currentPinBuffer === savedPin) {
+    disarmAlarm();
+  } else {
+    failedAttempts++;
+    currentPinBuffer = '';
+    updatePinDots();
+
+    if (failedAttempts >= 3) {
+      lockoutUntil = Date.now() + 10000;
+      failedAttempts = 0;
+      showLockdownError('❌ Wrong PIN! 10-second security lockout.');
+    } else {
+      showLockdownError(`❌ Wrong PIN! (${3 - failedAttempts} tries left)`);
+    }
+  }
+}
+
+// Physical keyboard listener on lockdown screen
+window.addEventListener('keydown', (e) => {
+  if (!alarmActive && !document.getElementById('lockdown-overlay').classList.contains('hidden')) return;
+  if (/^[0-9]$/.test(e.key)) {
+    pressKey(e.key);
+  } else if (e.key === 'Backspace') {
+    pressKey('DEL');
+  } else if (e.key === 'Escape') {
+    pressKey('C');
+  }
+});
 </script>
 </body>
 </html>
