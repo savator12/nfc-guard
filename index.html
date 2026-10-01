@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PhoneGuard">
 <meta name="application-name" content="PhoneGuard">
-<meta name="description" content="Cross-platform anti-theft alarm with NFC, motion sensing, and biometric unlock">
+<meta name="description" content="Cross-platform anti-theft alarm with background NFC, calibrated motion detection, and biometric unlock">
 
 <title>NFC & Motion Phone Guard</title>
 
@@ -131,10 +131,10 @@
     transition: all 0.3s ease;
   }
   .alert.show { display: block; animation: slideDown 0.3s ease; }
-  .alert-err { background: rgba(69, 10, 10, 0.9); color: #fca5a5; border: 1px solid #991b1b; }
-  .alert-ok  { background: rgba(5, 46, 22, 0.9); color: #86efac; border: 1px solid #166534; }
-  .alert-warn{ background: rgba(69, 26, 3, 0.9); color: #fcd34d; border: 1px solid #92400e; }
-  .alert-info{ background: rgba(15, 23, 42, 0.9); color: #93c5fd; border: 1px solid #1e40af; }
+  .alert-err { background: rgba(69, 10, 10, 0.95); color: #fca5a5; border: 1px solid #991b1b; }
+  .alert-ok  { background: rgba(5, 46, 22, 0.95); color: #86efac; border: 1px solid #166534; }
+  .alert-warn{ background: rgba(69, 26, 3, 0.95); color: #fcd34d; border: 1px solid #92400e; }
+  .alert-info{ background: rgba(15, 23, 42, 0.95); color: #93c5fd; border: 1px solid #1e40af; }
 
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-8px); }
@@ -177,11 +177,11 @@
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
-    padding: 1.25rem 0;
+    padding: 1.1rem 0;
   }
   .ring {
-    width: 140px;
-    height: 140px;
+    width: 136px;
+    height: 136px;
     border-radius: 50%;
     border: 4px solid var(--border);
     display: flex;
@@ -224,7 +224,7 @@
     50%      { box-shadow: 0 0 0 26px rgba(239, 68, 68, 0); }
   }
 
-  .ring-icon { font-size: 54px; line-height: 1; transition: all 0.3s; user-select: none; }
+  .ring-icon { font-size: 52px; line-height: 1; transition: all 0.3s; user-select: none; }
   .status-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); font-weight: 700; }
   .status-value { font-size: 18px; font-weight: 700; text-align: center; }
 
@@ -257,6 +257,76 @@
     font-size: 11px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* Motion Sensitivity Controls & Meter */
+  .sensitivity-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(51, 65, 85, 0.7);
+  }
+  .sens-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 600;
+  }
+  .sens-btn-group {
+    display: flex;
+    gap: 6px;
+    background: var(--bg);
+    padding: 3px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .sens-btn {
+    flex: 1;
+    padding: 6px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sens-btn.active {
+    background: var(--blue-dark);
+    color: #ffffff;
+  }
+  .motion-meter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .meter-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: var(--bg3);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .meter-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+    border-radius: 4px;
+    transition: width 0.1s linear;
+  }
+  .meter-threshold-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #ef4444;
+    box-shadow: 0 0 4px #ef4444;
   }
 
   /* PIN input */
@@ -381,24 +451,24 @@
     justify-content: center;
     padding: 20px;
     text-align: center;
-    animation: strobe 0.5s infinite;
-    backdrop-filter: blur(10px);
+    animation: strobe 0.4s infinite;
+    backdrop-filter: blur(12px);
     overflow: hidden;
   }
 
   @keyframes strobe {
-    0%, 100% { background-color: #7f1d1d; }
+    0%, 100% { background-color: #991b1b; }
     50%      { background-color: #000000; }
   }
 
   .lockdown-box {
     width: 100%;
     max-width: 360px;
-    background: rgba(15, 23, 42, 0.95);
-    border: 2px solid #ef4444;
+    background: rgba(15, 23, 42, 0.98);
+    border: 3px solid #ef4444;
     border-radius: 24px;
     padding: 24px 20px;
-    box-shadow: 0 0 50px rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 60px rgba(239, 68, 68, 0.8);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -414,6 +484,15 @@
     font-size: 13px;
     color: #fca5a5;
     line-height: 1.4;
+  }
+  .volume-lock-notice {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fef08a;
+    background: rgba(161, 98, 7, 0.4);
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #ca8a04;
   }
 
   /* PIN Display */
@@ -485,7 +564,7 @@
     </div>
     <h1>NFC & Motion Guard</h1>
     <p>Anti-theft alarm for dorms, cafes, and travel</p>
-    <span class="dev-badge">Developed by Bereketab Mihiretab • v2.0 Cross-Platform</span>
+    <span class="dev-badge">Developed by Bereketab Mihiretab • v2.1 Maximum Security</span>
   </div>
 
   <!-- Alert Banner -->
@@ -521,6 +600,29 @@
     <div class="steps" id="steps-container">
       <!-- Steps rendered dynamically based on mode -->
     </div>
+
+    <!-- Motion Sensitivity Settings & Live Meter -->
+    <div class="sensitivity-wrap" id="motion-config-wrap">
+      <div class="sens-label-row">
+        <span>Motion Sensitivity:</span>
+        <span id="sens-desc-text" style="color:var(--blue); font-weight:700;">Medium (Standard)</span>
+      </div>
+      <div class="sens-btn-group">
+        <button class="sens-btn" id="sens-low" onclick="setSensitivity('low')">Low (Beds/Shaky)</button>
+        <button class="sens-btn active" id="sens-medium" onclick="setSensitivity('medium')">Medium (Normal)</button>
+        <button class="sens-btn" id="sens-high" onclick="setSensitivity('high')">High (Light Touch)</button>
+      </div>
+      <div class="motion-meter-row">
+        <div class="sens-label-row">
+          <span>Live Movement Level:</span>
+          <span id="live-motion-val" style="font-family:monospace;">0.0 m/s²</span>
+        </div>
+        <div class="meter-bar-bg">
+          <div class="meter-bar-fill" id="meter-bar"></div>
+          <div class="meter-threshold-marker" id="meter-marker" style="left: 45%;"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- PIN & Biometric Setup -->
@@ -550,7 +652,7 @@
   <!-- Sound Test -->
   <div style="text-align: center; margin-top: -4px;">
     <button style="background:none; border:none; color:var(--text3); font-size:13px; text-decoration:underline; cursor:pointer;" onclick="testSiren()">
-      🔊 Test alarm siren (2 seconds)
+      🔊 Test Full-Volume Siren (2 seconds)
     </button>
   </div>
 
@@ -567,6 +669,8 @@
   <div class="lockdown-box">
     <div class="lockdown-title">🚨 THEFT ALARM TRIGGERED!</div>
     <div class="lockdown-desc">The phone was lifted or moved! Disarm immediately with Biometrics or PIN:</div>
+
+    <div class="volume-lock-notice">🔒 FULL-VOLUME SIREN LOCKED — Cannot be silenced without PIN/Biometrics</div>
 
     <!-- Quick Biometric Disarm Button -->
     <button class="btn btn-bio" id="btn-lockdown-bio" onclick="disarmWithBiometrics()">
@@ -617,19 +721,30 @@ let alarmActive = false;
 let savedPin = localStorage.getItem('nfc_guard_pin') || null;
 let savedBioCredId = localStorage.getItem('nfc_guard_bio_id') || null;
 
-// Hardware references
+// Hardware & Background NFC
 let nfcController = null;
 let nfcReadingActive = false;
 let lastSeenTagTime = 0;
+let lockedTagSerial = null;
 let checkInterval = null;
 let alarmInterval = null;
 let audioWatchdog = null;
+let speechInterval = null;
 let wakeLockSentinel = null;
 let audioCtx = null;
+let masterCompressor = null;
+let masterGain = null;
 
-// Motion Baseline
-let motionBaseline = null;
-let motionThreshold = 2.8; // m/s^2 delta sensitivity
+// Motion Calibration & Sensitivity
+let motionSensitivity = 'medium'; // 'low' | 'medium' | 'high'
+const sensitivityPresets = {
+  low:    { threshold: 8.5, requiredHits: 4, label: 'Low (Beds/Shaky Surfaces)', markerPct: 80 },
+  medium: { threshold: 5.2, requiredHits: 3, label: 'Medium (Standard / Tables)', markerPct: 50 },
+  high:   { threshold: 3.0, requiredHits: 2, label: 'High (Light Touch / Rigid)', markerPct: 28 }
+};
+
+let gravityFilter = { x: 0, y: 0, z: 9.8 };
+let consecutiveMotionHits = 0;
 let motionListener = null;
 
 // Keypad Buffer
@@ -655,7 +770,6 @@ const hasWebAuthn = window.PublicKeyCredential &&
   const compatDot = document.getElementById('compat-dot');
   const compatText = document.getElementById('compat-text');
 
-  // If iOS or browser lacks NFC, default to Motion Guard
   if (!hasNFC) {
     document.getElementById('mode-nfc').style.display = 'none';
     document.getElementById('mode-dual').style.display = 'none';
@@ -664,12 +778,20 @@ const hasWebAuthn = window.PublicKeyCredential &&
     compatText.textContent = isIOS ? 'iOS Safari: Motion Guard active (Face ID / PIN ready)' : 'Motion Guard active';
   } else {
     compatDot.className = 'dot ok';
-    compatText.textContent = 'Full Hardware Support: NFC + Motion + Biometrics';
+    compatText.textContent = 'Hardware Support: NFC + Calibrated Motion + Biometrics';
+    // Pre-start background NFC reader to capture tags and prevent Chrome from launching URLs
+    startBackgroundNFCReader();
   }
+
+  // Set default sensitivity
+  setSensitivity('medium');
 
   // Check Biometrics (Face ID / Touch ID / Android Fingerprint)
   await checkBiometricsSupport();
   updateInstructions();
+
+  // Start live motion preview
+  startLiveMotionPreview();
 })();
 
 async function checkBiometricsSupport() {
@@ -714,7 +836,29 @@ function setGuardMode(mode) {
     const btn = document.getElementById('mode-' + m);
     if (btn) btn.classList.toggle('active', m === mode);
   });
+
+  const motionWrap = document.getElementById('motion-config-wrap');
+  if (mode === 'nfc') {
+    motionWrap.style.display = 'none';
+    startBackgroundNFCReader();
+  } else {
+    motionWrap.style.display = 'flex';
+    if (mode === 'dual') startBackgroundNFCReader();
+  }
+
   updateInstructions();
+}
+
+function setSensitivity(level) {
+  motionSensitivity = level;
+  ['low', 'medium', 'high'].forEach(l => {
+    const btn = document.getElementById('sens-' + l);
+    if (btn) btn.classList.toggle('active', l === level);
+  });
+
+  const preset = sensitivityPresets[level];
+  document.getElementById('sens-desc-text').textContent = preset.label;
+  document.getElementById('meter-marker').style.left = preset.markerPct + '%';
 }
 
 function updateInstructions() {
@@ -725,24 +869,24 @@ function updateInstructions() {
     modeLabel.textContent = 'Universal Motion Guard';
     container.innerHTML = `
       <div class="step"><span class="step-num">1</span><span>Set your 4-digit PIN below (or enable Biometrics).</span></div>
-      <div class="step"><span class="step-num">2</span><span>Tap <strong>Arm Alarm</strong> — a 5-second countdown begins.</span></div>
-      <div class="step"><span class="step-num">3</span><span>Place your phone flat on your desk, nightstand, or laptop.</span></div>
-      <div class="step"><span class="step-num">4</span><span>If anyone lifts, tilts, or moves the phone, the siren fires immediately!</span></div>
+      <div class="step"><span class="step-num">2</span><span>Adjust sensitivity if your table vibrates or if using in bed.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Tap <strong>Arm Alarm</strong> — a 5-second countdown begins.</span></div>
+      <div class="step"><span class="step-num">4</span><span>Place phone flat on surface. Alarm fires at full volume if lifted!</span></div>
     `;
   } else if (guardMode === 'nfc') {
-    modeLabel.textContent = 'NFC Tag Guard';
+    modeLabel.textContent = 'Background NFC Tag Guard';
     container.innerHTML = `
-      <div class="step"><span class="step-num">1</span><span>Set your 4-digit PIN below.</span></div>
-      <div class="step"><span class="step-num">2</span><span>Tap <strong>Arm Alarm</strong> and hold an NFC card/tag against the back of the phone.</span></div>
-      <div class="step"><span class="step-num">3</span><span>Leave the phone resting on the card and rest easily.</span></div>
-      <div class="step"><span class="step-num">4</span><span>If lifted away from the tag, the siren triggers!</span></div>
+      <div class="step"><span class="step-num">1</span><span>Background NFC reader is active — tap any card safely without opening links!</span></div>
+      <div class="step"><span class="step-num">2</span><span>Set your 4-digit PIN below.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Tap <strong>Arm Alarm</strong>, place phone over your NFC card/sticker.</span></div>
+      <div class="step"><span class="step-num">4</span><span>If the phone is lifted off the card, the full-volume siren triggers!</span></div>
     `;
   } else {
     modeLabel.textContent = 'Dual Guard (NFC + Motion)';
     container.innerHTML = `
-      <div class="step"><span class="step-num">1</span><span>Locks phone with both NFC proximity AND motion sensor.</span></div>
-      <div class="step"><span class="step-num">2</span><span>Place phone on NFC card during 5s arming countdown.</span></div>
-      <div class="step"><span class="step-num">3</span><span>Alarm triggers if the card is removed OR if the phone is picked up!</span></div>
+      <div class="step"><span class="step-num">1</span><span>Combines NFC proximity with calibrated motion detection.</span></div>
+      <div class="step"><span class="step-num">2</span><span>Place phone on NFC card during 5-second arming countdown.</span></div>
+      <div class="step"><span class="step-num">3</span><span>Alarm triggers if lifted off card OR moved in any direction!</span></div>
     `;
   }
 }
@@ -809,8 +953,8 @@ async function enrollBiometrics() {
           displayName: "Phone Owner"
         },
         pubKeyCredParams: [
-          { alg: -7, type: "public-key" },   // ES256
-          { alg: -257, type: "public-key" }  // RS256
+          { alg: -7, type: "public-key" },
+          { alg: -257, type: "public-key" }
         ],
         authenticatorSelection: {
           authenticatorAttachment: "platform",
@@ -864,11 +1008,26 @@ async function disarmWithBiometrics() {
   }
 }
 
-// ── 6. Audio Synthesizer & Watchdog ─────────────────────────
+// ── 6. FULL-VOLUME UNSILENCEABLE SIREN & COMPRESSOR ─────────
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Master compressor to maximize acoustic volume without clipping
+    masterCompressor = audioCtx.createDynamicsCompressor();
+    masterCompressor.threshold.setValueAtTime(-1, audioCtx.currentTime);
+    masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
+    masterCompressor.ratio.setValueAtTime(20, audioCtx.currentTime);
+    masterCompressor.attack.setValueAtTime(0.001, audioCtx.currentTime);
+    masterCompressor.release.setValueAtTime(0.05, audioCtx.currentTime);
+    masterCompressor.connect(audioCtx.destination);
+
+    // High-gain stage (Full-Blast Volume)
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(2.5, audioCtx.currentTime);
+    masterGain.connect(masterCompressor);
   }
+
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
@@ -877,65 +1036,98 @@ function initAudio() {
 document.addEventListener('click', initAudio, { once: true });
 document.addEventListener('touchstart', initAudio, { once: true });
 
-function playSiren() {
+function playFullVolumeSiren() {
   try {
     initAudio();
     const now = audioCtx.currentTime;
-    const dur = 1.3;
+    const dur = 1.2;
 
-    // Dual-tone dissonant siren
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    // Enforce 100% full volume gain
+    masterGain.gain.setValueAtTime(2.5, now);
 
-    osc1.type = 'sawtooth';
-    osc2.type = 'square';
+    // 3 Dissonant multi-harmonic oscillators (Maximum Human Ear Ear-Piercing Range)
+    const osc1 = audioCtx.createOscillator(); // Sharp Square Wave (High siren)
+    const osc2 = audioCtx.createOscillator(); // Sawtooth Wave (Warble)
+    const osc3 = audioCtx.createOscillator(); // Sub horn
 
-    // Frequency sweep
-    const lo = 750, hi = 1550;
-    osc1.frequency.setValueAtTime(lo, now);
-    osc1.frequency.linearRampToValueAtTime(hi, now + dur * 0.5);
-    osc1.frequency.linearRampToValueAtTime(lo, now + dur);
+    osc1.type = 'square';
+    osc2.type = 'sawtooth';
+    osc3.type = 'triangle';
 
-    osc2.frequency.setValueAtTime(lo * 1.2, now);
-    osc2.frequency.linearRampToValueAtTime(hi * 1.2, now + dur * 0.5);
-    osc2.frequency.linearRampToValueAtTime(lo * 1.2, now + dur);
+    // Frequencies designed for maximum psychoacoustic alarm salience (700Hz - 2200Hz)
+    osc1.frequency.setValueAtTime(1100, now);
+    osc1.frequency.linearRampToValueAtTime(2100, now + dur * 0.5);
+    osc1.frequency.linearRampToValueAtTime(1100, now + dur);
 
-    // Max volume envelope
-    gain.gain.setValueAtTime(0.01, now);
-    gain.gain.linearRampToValueAtTime(1.0, now + 0.05);
-    gain.gain.setValueAtTime(1.0, now + dur - 0.05);
-    gain.gain.linearRampToValueAtTime(0.01, now + dur);
+    osc2.frequency.setValueAtTime(750, now);
+    osc2.frequency.linearRampToValueAtTime(1450, now + dur * 0.5);
+    osc2.frequency.linearRampToValueAtTime(750, now + dur);
 
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(audioCtx.destination);
+    osc3.frequency.setValueAtTime(450, now);
+    osc3.frequency.linearRampToValueAtTime(900, now + dur * 0.5);
+    osc3.frequency.linearRampToValueAtTime(450, now + dur);
+
+    osc1.connect(masterGain);
+    osc2.connect(masterGain);
+    osc3.connect(masterGain);
 
     osc1.start(now);
     osc2.start(now);
+    osc3.start(now);
+
     osc1.stop(now + dur);
     osc2.stop(now + dur);
+    osc3.stop(now + dur);
 
   } catch (e) {
     console.error('Audio play error:', e);
   }
 
-  // Violent Vibration
+  // Violent pulsating vibration
   try {
     if (navigator.vibrate) {
-      navigator.vibrate([800, 150, 800, 150, 1000]);
+      navigator.vibrate([1000, 100, 1000, 100, 1000]);
     }
+  } catch (e) {}
+}
+
+function speakVoiceAlert() {
+  if (!('speechSynthesis' in window) || !alarmActive) return;
+  try {
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance('Warning! Theft alarm triggered! Put the phone down!');
+    msg.volume = 1.0;
+    msg.rate = 1.25;
+    msg.pitch = 1.35;
+    window.speechSynthesis.speak(msg);
   } catch (e) {}
 }
 
 function testSiren() {
   initAudio();
-  playSiren();
-  showAlert('🔊 Playing siren test for 2 seconds...', 'info');
+  playFullVolumeSiren();
+  speakVoiceAlert();
+  showAlert('🔊 Playing Full-Volume Siren Test (2 seconds)...', 'info');
   setTimeout(hideAlert, 2500);
 }
 
-// ── 7. Screen Wake Lock & Fullscreen Lockdown ───────────────
+// ── 7. VOLUME BUTTON LOCK & NAVIGATION TRAPPING ─────────────
+// Intercept hardware volume buttons so intruder cannot silence or alter volume
+window.addEventListener('keydown', (e) => {
+  if (alarmActive || armed) {
+    const key = e.key;
+    if (['AudioVolumeDown', 'AudioVolumeUp', 'VolumeDown', 'VolumeUp', 'VolumeMute'].includes(key) ||
+        e.keyCode === 174 || e.keyCode === 175 || e.keyCode === 173) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Force audio resume at full volume if thief tries to mute
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      if (masterGain && audioCtx) masterGain.gain.setValueAtTime(2.5, audioCtx.currentTime);
+      speakVoiceAlert();
+    }
+  }
+}, { capture: true });
+
 async function acquireWakeLock() {
   try {
     if ('wakeLock' in navigator) {
@@ -998,7 +1190,7 @@ function exitFullscreenSafe() {
 }
 
 // ── 8. ALARM TRIGGER & LOCKDOWN ─────────────────────────────
-function startAlarm(reason = 'Motion or tag moved!') {
+function startAlarm(reason = 'Phone moved or lifted!') {
   if (alarmActive) return;
   alarmActive = true;
 
@@ -1008,17 +1200,22 @@ function startAlarm(reason = 'Motion or tag moved!') {
   requestFullscreenSafe();
   acquireWakeLock();
   initAudio();
-  playSiren();
+  playFullVolumeSiren();
+  speakVoiceAlert();
 
-  // Continuous watchdog siren loop (fires every 1.35s)
-  alarmInterval = setInterval(playSiren, 1350);
+  // Continuous Full-Volume Siren Loop (repeats every 1.25s)
+  alarmInterval = setInterval(playFullVolumeSiren, 1250);
 
-  // Audio Context recovery watchdog
+  // Secondary Voice Alert Loop (repeats every 3.5s)
+  speechInterval = setInterval(speakVoiceAlert, 3500);
+
+  // Audio Context & Full-Volume Enforcement Watchdog (checks every 100ms)
   audioWatchdog = setInterval(() => {
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+    if (audioCtx) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (masterGain) masterGain.gain.setValueAtTime(2.5, audioCtx.currentTime);
     }
-  }, 300);
+  }, 100);
 
   // If biometrics enrolled, prompt immediately
   if (savedBioCredId) {
@@ -1029,11 +1226,14 @@ function startAlarm(reason = 'Motion or tag moved!') {
 function stopAlarm() {
   alarmActive = false;
   clearInterval(alarmInterval);
+  clearInterval(speechInterval);
   clearInterval(audioWatchdog);
   alarmInterval = null;
+  speechInterval = null;
   audioWatchdog = null;
 
   try {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     if (navigator.vibrate) navigator.vibrate(0);
   } catch (e) {}
 
@@ -1042,59 +1242,75 @@ function stopAlarm() {
   exitFullscreenSafe();
 }
 
-// ── 9. Motion Sensor Logic ──────────────────────────────────
+// ── 9. CALIBRATED MOTION SENSOR & LIVE PREVIEW ──────────────
+function calculateMotionMagnitude(event) {
+  let mag = 0;
+  // Prioritize hardware linear acceleration (gravity already removed by sensor fusion)
+  if (event.acceleration && event.acceleration.x !== null) {
+    const ax = event.acceleration.x || 0;
+    const ay = event.acceleration.y || 0;
+    const az = event.acceleration.z || 0;
+    mag = Math.sqrt(ax * ax + ay * ay + az * az);
+  } else if (event.accelerationIncludingGravity) {
+    // High-pass filter to remove constant gravity and prevent slow drift false alarms
+    const raw = event.accelerationIncludingGravity;
+    const rx = raw.x || 0, ry = raw.y || 0, rz = raw.z || 0;
+    const alpha = 0.85; // Low-pass factor for gravity
+    gravityFilter.x = alpha * gravityFilter.x + (1 - alpha) * rx;
+    gravityFilter.y = alpha * gravityFilter.y + (1 - alpha) * ry;
+    gravityFilter.z = alpha * gravityFilter.z + (1 - alpha) * rz;
+
+    const lx = rx - gravityFilter.x;
+    const ly = ry - gravityFilter.y;
+    const lz = rz - gravityFilter.z;
+    mag = Math.sqrt(lx * lx + ly * ly + lz * lz);
+  }
+  return mag;
+}
+
+function startLiveMotionPreview() {
+  window.addEventListener('devicemotion', (evt) => {
+    const mag = calculateMotionMagnitude(evt);
+    const meterFill = document.getElementById('meter-bar');
+    const liveVal = document.getElementById('live-motion-val');
+    if (meterFill && liveVal) {
+      // Map 0 - 10 m/s^2 to 0 - 100%
+      const pct = Math.min(100, Math.round((mag / 10) * 100));
+      meterFill.style.width = pct + '%';
+      liveVal.textContent = mag.toFixed(1) + ' m/s²';
+    }
+  }, true);
+}
+
 async function enableMotionDetection() {
-  // iOS 13+ permission request
   if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
     try {
       const permission = await DeviceMotionEvent.requestPermission();
       if (permission !== 'granted') {
-        showAlert('Motion permission denied. Cannot guard without sensor access.', 'err');
+        showAlert('Motion sensor permission denied.', 'err');
         return false;
       }
     } catch (err) {
-      showAlert('Motion sensor permission error: ' + err.message, 'err');
+      showAlert('Motion permission error: ' + err.message, 'err');
       return false;
     }
   }
 
-  motionBaseline = null;
-  let samplesCollected = 0;
-  let accSum = { x: 0, y: 0, z: 0 };
+  consecutiveMotionHits = 0;
+  const preset = sensitivityPresets[motionSensitivity];
 
   motionListener = (event) => {
-    if (!armed) return;
-    const acc = event.accelerationIncludingGravity || event.acceleration;
-    if (!acc) return;
+    if (!armed || alarmActive) return;
+    const mag = calculateMotionMagnitude(event);
 
-    const x = acc.x || 0, y = acc.y || 0, z = acc.z || 0;
-
-    // Collect baseline gravity vector for first 10 samples
-    if (samplesCollected < 10) {
-      accSum.x += x; accSum.y += y; accSum.z += z;
-      samplesCollected++;
-      if (samplesCollected === 10) {
-        motionBaseline = {
-          x: accSum.x / 10,
-          y: accSum.y / 10,
-          z: accSum.z / 10
-        };
+    // Require sustained movement across consecutive sensor frames to avoid noise spikes
+    if (mag > preset.threshold) {
+      consecutiveMotionHits++;
+      if (consecutiveMotionHits >= preset.requiredHits) {
+        startAlarm('Phone moved or lifted! Movement: ' + mag.toFixed(1) + ' m/s²');
       }
-      return;
-    }
-
-    if (!motionBaseline) return;
-
-    // Calculate delta acceleration from baseline
-    const dx = x - motionBaseline.x;
-    const dy = y - motionBaseline.y;
-    const dz = z - motionBaseline.z;
-    const delta = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-    // If movement exceeds sensitivity threshold -> Trigger Alarm
-    if (delta > motionThreshold) {
-      console.warn('Motion triggered with delta:', delta);
-      startAlarm('Phone moved or lifted!');
+    } else {
+      consecutiveMotionHits = Math.max(0, consecutiveMotionHits - 1);
     }
   };
 
@@ -1107,45 +1323,43 @@ function disableMotionDetection() {
     window.removeEventListener('devicemotion', motionListener, true);
     motionListener = null;
   }
-  motionBaseline = null;
+  consecutiveMotionHits = 0;
 }
 
-// ── 10. Web NFC Logic (Proper AbortController) ──────────────
-async function enableNFC() {
-  if (!('NDEFReader' in window)) return false;
+// ── 10. BACKGROUND NFC READER (NO URL REDIRECTS) ────────────
+async function startBackgroundNFCReader() {
+  if (!('NDEFReader' in window)) return;
+  if (nfcReadingActive) return;
+
   try {
     if (nfcController) nfcController.abort();
     nfcController = new AbortController();
 
     const ndef = new NDEFReader();
+    // Putting Chrome in foreground reader mode intercepts NDEF tags and PREVENTS Android from opening links!
     await ndef.scan({ signal: nfcController.signal });
-
     nfcReadingActive = true;
-    lastSeenTagTime = Date.now();
 
     ndef.addEventListener('reading', (evt) => {
       lastSeenTagTime = Date.now();
-      const serial = evt.serialNumber || 'tag';
-      setStatus('🔒 Armed & Locked on NFC Tag', 'detected', '🛡️');
-      showAlert('✅ NFC Tag locked in (' + serial + '). Place phone down and sleep!', 'ok');
+      const serial = evt.serialNumber || 'NFC-Tag';
+      lockedTagSerial = serial;
+
+      // DO NOT navigate or follow any NDEF link records!
+      if (armed) {
+        setStatus('🔒 Armed & Locked on NFC Tag', 'detected', '🛡️');
+      } else {
+        showAlert(`📡 Tag Detected: ${serial} (Background reader active — links suppressed)`, 'ok');
+      }
     });
 
-    // Check interval: if NFC-only mode, detects if tag was removed
-    if (guardMode === 'nfc') {
-      checkInterval = setInterval(() => {
-        if (!armed || alarmActive) return;
-        // If tag hasn't been read in 5 seconds
-        if (lastSeenTagTime > 0 && Date.now() - lastSeenTagTime > 5000) {
-          startAlarm('NFC tag disconnected or phone lifted!');
-        }
-      }, 1000);
-    }
+    ndef.addEventListener('readingerror', () => {
+      // Continue silently without dispatching to browser
+    });
 
-    return true;
+    console.log('Background NFC scanner started.');
   } catch (err) {
-    console.error('NFC Scan failed:', err);
-    showAlert('NFC Scan error: ' + (err.message || err), 'warn');
-    return false;
+    console.warn('Background NFC Scan warning:', err.message || err);
   }
 }
 
@@ -1180,16 +1394,21 @@ async function armAlarm() {
   initAudio();
   hideAlert();
 
-  // 5-second arming countdown
+  // If in NFC or Dual mode, ensure background NFC scanner is active
+  if (guardMode === 'nfc' || guardMode === 'dual') {
+    await startBackgroundNFCReader();
+  }
+
+  // 5-second arming countdown to allow user to place phone down smoothly
   let countdown = 5;
-  setStatus(`Arming in ${countdown}s... Place phone down!`, 'scanning', '⏳');
+  setStatus(`Arming in ${countdown}s... Set phone down!`, 'scanning', '⏳');
   document.getElementById('btn-arm').classList.add('hidden');
   document.getElementById('btn-disarm').classList.remove('hidden');
 
   armingTimer = setInterval(async () => {
     countdown--;
     if (countdown > 0) {
-      setStatus(`Arming in ${countdown}s... Place phone down!`, 'scanning', '⏳');
+      setStatus(`Arming in ${countdown}s... Set phone down!`, 'scanning', '⏳');
     } else {
       clearInterval(armingTimer);
       armingTimer = null;
@@ -1202,14 +1421,22 @@ async function activateGuard() {
   armed = true;
   acquireWakeLock();
   setStatus('🛡️ ARMED & GUARDING', 'armed', '🛡️');
-  showAlert('✅ Guard armed! Any movement or tampering will trigger the siren.', 'ok');
+  showAlert('✅ Guard armed! Phone is locked at full-volume sensitivity.', 'ok');
   setTimeout(hideAlert, 3000);
 
   if (guardMode === 'motion' || guardMode === 'dual') {
     await enableMotionDetection();
   }
   if (guardMode === 'nfc' || guardMode === 'dual') {
-    await enableNFC();
+    // If NFC-only mode, poll for card presence
+    if (guardMode === 'nfc') {
+      checkInterval = setInterval(() => {
+        if (!armed || alarmActive) return;
+        if (lastSeenTagTime > 0 && Date.now() - lastSeenTagTime > 5000) {
+          startAlarm('NFC tag disconnected or phone lifted!');
+        }
+      }, 1000);
+    }
   }
 }
 
@@ -1228,14 +1455,13 @@ function disarmAlarm() {
     armingTimer = null;
   }
   disableMotionDetection();
-  disableNFC();
   stopAlarm();
   releaseWakeLock();
 
   setStatus('Ready to arm', 'idle', '🛡️');
   document.getElementById('btn-arm').classList.remove('hidden');
   document.getElementById('btn-disarm').classList.add('hidden');
-  showAlert('🔓 Alarm successfully disarmed with authorization.', 'ok');
+  showAlert('🔓 Alarm successfully disarmed.', 'ok');
   setTimeout(hideAlert, 3000);
 }
 
@@ -1304,7 +1530,7 @@ function verifyPinAttempt() {
 
 // Physical keyboard listener on lockdown screen
 window.addEventListener('keydown', (e) => {
-  if (!alarmActive && !document.getElementById('lockdown-overlay').classList.contains('hidden')) return;
+  if (!alarmActive && document.getElementById('lockdown-overlay').classList.contains('hidden')) return;
   if (/^[0-9]$/.test(e.key)) {
     pressKey(e.key);
   } else if (e.key === 'Backspace') {
