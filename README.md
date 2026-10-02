@@ -1,4 +1,4 @@
-# 🛡️ NFC & Motion Phone Guard
+#  NFC & Motion Phone Guard
 
 > **Cross-Platform Anti-Theft Guard for Dorms, Cafes, and Travel**  
 > Developed by **Bereketab Mihiretab** • Version 2.0
@@ -7,28 +7,28 @@ An anti-theft progressive web app (PWA) designed to protect your smartphone when
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
-- 📱 **Universal Cross-Platform Support (iPhone & Android)**:
+-  **Universal Cross-Platform Support (iPhone & Android)**:
   - **Universal Motion Guard (iPhone & Android)**: Uses the device's accelerometer and gyroscope with baseline gravity calibration to instantly detect lift, tilt, and shift.
   - **NFC Tag Guard (Android Chrome)**: Pairs with any physical NFC card (dorm keycard, transit card, hotel card, or NFC sticker).
   - **Dual Guard (NFC + Motion)**: Combines NFC tag proximity with motion sensing for double protection.
-- 🧬 **Biometric Disarming (WebAuthn)**:
+-  **Biometric Disarming (WebAuthn)**:
   - Disarm the alarm in a fraction of a second using native **Face ID / Touch ID** (iOS Safari) or **Fingerprint / Face Unlock** (Android Chrome).
   - Emergency 4-digit PIN fallback with an on-screen keypad and anti-brute-force rate limiting.
-- 🚨 **Anti-Theft Lockdown**:
+-  **Anti-Theft Lockdown**:
   - **Unsilenceable Siren**: High-gain synthesized dual-tone siren (sawtooth + square wave) that recovers automatically if interrupted.
   - **Navigation Trapping**: Traps the Android back button (`popstate`) and warns on page leave (`beforeunload`).
   - **Screen Wake Lock**: Prevents the screen from turning off or sleeping while armed or alarming.
   - **Flashing Strobe UI**: Fullscreen high-visibility emergency strobe clearly alerting anyone nearby that the device is stolen.
-- 📦 **Complete PWA & Offline Support**:
+-  **Complete PWA & Offline Support**:
   - Ready for **Add to Home Screen** on both Chrome (Android/Desktop) and Safari (iOS).
   - High-resolution app icons (`192x192`, `512x512`, `apple-touch-icon.png`, vector SVG, and favicons).
   - Works 100% offline via Service Worker (`sw.js`).
 
 ---
 
-## 🛠️ How It Works
+##  How It Works
 
 ### For iPhone Users (iOS Safari)
 1. Open the app in **Safari** on iOS.
@@ -41,7 +41,7 @@ An anti-theft progressive web app (PWA) designed to protect your smartphone when
 
 ### For Android Users (Chrome)
 1. Open the app in **Chrome** on Android.
-2. Tap the three dots menu `⋮` and select **Install app** or **Add to Home screen**.
+2. Tap the three dots menu  and select **Install app** or **Add to Home screen**.
 3. Choose your preferred guard mode:
    - **Motion Guard**: Protects phone using movement sensors anywhere.
    - **NFC Guard**: Place an NFC keycard against the phone to lock.
@@ -50,7 +50,7 @@ An anti-theft progressive web app (PWA) designed to protect your smartphone when
 
 ---
 
-## 🔐 Security & Disarm Methods
+##  Security & Disarm Methods
 
 | Method | Description |
 | :--- | :--- |
@@ -59,7 +59,7 @@ An anti-theft progressive web app (PWA) designed to protect your smartphone when
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```
 nfc-guard/
@@ -77,7 +77,7 @@ nfc-guard/
 
 ---
 
-## 🌐 Local Testing & Deployment
+##  Local Testing & Deployment
 
 To run and test locally:
 ```bash
