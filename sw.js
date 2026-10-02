@@ -1,4 +1,4 @@
-const CACHE = 'nfc-guard-v2';
+const CACHE = 'nfc-guard-v2.2';
 const FILES = [
   './',
   './index.html',

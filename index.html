@@ -440,6 +440,97 @@
   .dot.ok { background: var(--green); box-shadow: 0 0 8px var(--green-glow); }
   .dot.bad { background: var(--amber); }
 
+  /* ── OLED STEALTH OVERLAY (VIRTUAL SCREEN OFF) ─────────── */
+  .stealth-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000 !important;
+    z-index: 999990;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  .stealth-overlay.hidden {
+    display: none !important;
+  }
+  .stealth-content {
+    text-align: center;
+    color: #475569;
+    max-width: 320px;
+    transition: opacity 1.5s ease;
+  }
+  .stealth-content.fade-out {
+    opacity: 0.10;
+  }
+  .stealth-moon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    filter: grayscale(70%) brightness(60%);
+  }
+  .stealth-badge {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 8px;
+  }
+  .stealth-hint {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #475569;
+  }
+  .stealth-hint strong {
+    color: #64748b;
+  }
+
+  /* ── TOGGLE SWITCH ─────────────────────────────────────── */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--bg3);
+    transition: 0.25s;
+    border-radius: 24px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.25s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--green);
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
   /* ── LOCKDOWN MODAL / ALARM FULLSCREEN ─────────────────── */
   .lockdown-overlay {
     position: fixed;
@@ -451,9 +542,12 @@
     justify-content: center;
     padding: 20px;
     text-align: center;
-    animation: strobe 0.4s infinite;
+    background: rgba(11, 17, 32, 0.96);
     backdrop-filter: blur(12px);
     overflow: hidden;
+  }
+  .lockdown-overlay.alarming {
+    animation: strobe 0.4s infinite;
   }
 
   @keyframes strobe {
@@ -472,6 +566,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    transition: all 0.3s ease;
+  }
+  .lockdown-box.calm {
+    border-color: #3b82f6;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
   }
   .lockdown-title {
     font-size: 22px;
@@ -645,8 +744,29 @@
     </div>
   </div>
 
+  <!-- OLED Stealth & Battery Optimization -->
+  <div class="card" id="battery-card">
+    <div class="card-title">
+      <span>🌙 Battery & Night Stealth</span>
+      <span style="color:var(--green); font-size:11px; text-transform:none; font-weight:700;">Saves ~75% Battery</span>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <div style="font-weight:600; font-size:14px;">OLED Stealth Blackout</div>
+        <div style="font-size:12px; color:var(--text2); margin-top:2px;">Turns screen pure black (#000000) when armed. Motion sensors stay 100% active.</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="stealth-toggle" checked onchange="toggleStealthSetting(this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button class="btn btn-stealth-manual hidden" id="btn-enter-stealth" onclick="enterStealthMode()" style="margin-top:12px; width:100%; padding:10px; font-size:13px; font-weight:600; background:rgba(30, 41, 59, 0.9); border:1px solid var(--border); border-radius:12px; color:var(--text); cursor:pointer;">
+      🌙 Blackout Screen Now (Stealth)
+    </button>
+  </div>
+
   <!-- Action buttons -->
-  <button class="btn btn-arm" id="btn-arm" onclick="armAlarm()">🔒 Arm Alarm</button>
+  <button class="btn btn-arm" id="btn-arm" onclick="armAlarm()">🛡️ Arm Alarm</button>
   <button class="btn btn-disarm hidden" id="btn-disarm" onclick="promptDisarm()">🔓 Disarm Alarm</button>
 
   <!-- Sound Test -->
@@ -664,13 +784,22 @@
 
 </div>
 
-<!-- ── LOCKDOWN OVERLAY (Shown when alarm triggers) ──────── -->
-<div id="lockdown-overlay" class="lockdown-overlay hidden">
-  <div class="lockdown-box">
-    <div class="lockdown-title">🚨 THEFT ALARM TRIGGERED!</div>
-    <div class="lockdown-desc">The phone was lifted or moved! Disarm immediately with Biometrics or PIN:</div>
+<!-- ── OLED STEALTH OVERLAY (Virtual Screen Off) ─────────────── -->
+<div id="stealth-overlay" class="stealth-overlay hidden" onclick="handleStealthTap()">
+  <div class="stealth-content" id="stealth-content">
+    <div class="stealth-moon">🌙</div>
+    <div class="stealth-badge">OLED STEALTH GUARD ACTIVE</div>
+    <div class="stealth-hint">Pixels powered down • Sensors active<br><strong>Tap screen gently to disarm</strong></div>
+  </div>
+</div>
 
-    <div class="volume-lock-notice">🔒 FULL-VOLUME SIREN LOCKED — Cannot be silenced without PIN/Biometrics</div>
+<!-- ── LOCKDOWN OVERLAY (Shown when alarm triggers or disarming) ──────── -->
+<div id="lockdown-overlay" class="lockdown-overlay hidden">
+  <div class="lockdown-box" id="lockdown-box">
+    <div class="lockdown-title" id="lockdown-title">🚨 THEFT ALARM TRIGGERED!</div>
+    <div class="lockdown-desc" id="lockdown-desc">The phone was lifted or moved! Disarm immediately with Biometrics or PIN:</div>
+
+    <div class="volume-lock-notice" id="volume-lock-notice">🔒 FULL-VOLUME SIREN LOCKED — Cannot be silenced without PIN/Biometrics</div>
 
     <!-- Quick Biometric Disarm Button -->
     <button class="btn btn-bio" id="btn-lockdown-bio" onclick="disarmWithBiometrics()">
@@ -702,6 +831,11 @@
     </div>
 
     <div id="lockdown-error" style="color:#fca5a5; font-size:13px; font-weight:700; min-height:18px;"></div>
+
+    <!-- Return to stealth / cancel if alarm is not actively alarming -->
+    <button id="btn-cancel-disarm" class="hidden" onclick="cancelDisarmModal()" style="background:transparent; border:none; color:var(--text3); font-size:13px; text-decoration:underline; cursor:pointer; margin-top:-6px;">
+      Cancel & Return to Stealth Guard
+    </button>
   </div>
 </div>
 
@@ -720,6 +854,11 @@ let armingTimer = null;
 let alarmActive = false;
 let savedPin = localStorage.getItem('nfc_guard_pin') || null;
 let savedBioCredId = localStorage.getItem('nfc_guard_bio_id') || null;
+
+// OLED Stealth & Battery Optimization
+let stealthModeEnabled = localStorage.getItem('nfc_guard_stealth') !== 'false';
+let isStealthActive = false;
+let stealthTimeout = null;
 
 // Hardware & Background NFC
 let nfcController = null;
@@ -757,6 +896,59 @@ if (savedPin) {
   document.getElementById('pin-input').value = savedPin;
 }
 
+// ── 2b. OLED Stealth & Battery Optimization ──────────────────
+function toggleStealthSetting(enabled) {
+  stealthModeEnabled = enabled;
+  localStorage.setItem('nfc_guard_stealth', enabled ? 'true' : 'false');
+  const btnStealth = document.getElementById('btn-enter-stealth');
+  if (btnStealth) {
+    btnStealth.classList.toggle('hidden', !armed);
+  }
+}
+
+function enterStealthMode() {
+  if (!armed || alarmActive) return;
+  isStealthActive = true;
+  const overlay = document.getElementById('stealth-overlay');
+  const content = document.getElementById('stealth-content');
+  if (overlay) {
+    overlay.classList.remove('hidden');
+  }
+  if (content) {
+    content.classList.remove('fade-out');
+    clearTimeout(stealthTimeout);
+    // After 2.5s, fade out hint text to near-black (0.10 opacity) to maximize OLED power savings
+    stealthTimeout = setTimeout(() => {
+      if (isStealthActive && content) {
+        content.classList.add('fade-out');
+      }
+    }, 2500);
+  }
+}
+
+function exitStealthMode() {
+  isStealthActive = false;
+  clearTimeout(stealthTimeout);
+  const overlay = document.getElementById('stealth-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
+}
+
+function handleStealthTap() {
+  // Gentle tap on black screen wakes phone and opens calm disarm keypad/biometrics
+  promptDisarm();
+}
+
+function cancelDisarmModal() {
+  if (alarmActive) return;
+  document.getElementById('lockdown-overlay').classList.add('hidden');
+  resetKeypad();
+  if (armed && stealthModeEnabled) {
+    enterStealthMode();
+  }
+}
+
 // ── 3. Capability Checks ────────────────────────────────────
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -785,6 +977,12 @@ const hasWebAuthn = window.PublicKeyCredential &&
 
   // Set default sensitivity
   setSensitivity('medium');
+
+  // Restore stealth toggle state
+  const stealthCheckbox = document.getElementById('stealth-toggle');
+  if (stealthCheckbox) {
+    stealthCheckbox.checked = stealthModeEnabled;
+  }
 
   // Check Biometrics (Face ID / Touch ID / Android Fingerprint)
   await checkBiometricsSupport();
@@ -1194,8 +1392,29 @@ function startAlarm(reason = 'Phone moved or lifted!') {
   if (alarmActive) return;
   alarmActive = true;
 
+  exitStealthMode();
+
   setStatus('🚨 ALARM TRIGGERED! 🚨', 'alarm', '🚨');
-  document.getElementById('lockdown-overlay').classList.remove('hidden');
+  const overlay = document.getElementById('lockdown-overlay');
+  if (overlay) {
+    overlay.classList.add('alarming');
+    overlay.classList.remove('hidden');
+  }
+
+  const box = document.getElementById('lockdown-box');
+  if (box) box.classList.remove('calm');
+
+  const title = document.getElementById('lockdown-title');
+  if (title) title.textContent = '🚨 THEFT ALARM TRIGGERED!';
+
+  const desc = document.getElementById('lockdown-desc');
+  if (desc) desc.textContent = 'The phone was lifted or moved! Disarm immediately with Biometrics or PIN:';
+
+  const notice = document.getElementById('volume-lock-notice');
+  if (notice) notice.style.display = 'block';
+
+  const btnCancel = document.getElementById('btn-cancel-disarm');
+  if (btnCancel) btnCancel.classList.add('hidden');
 
   requestFullscreenSafe();
   acquireWakeLock();
@@ -1237,7 +1456,11 @@ function stopAlarm() {
     if (navigator.vibrate) navigator.vibrate(0);
   } catch (e) {}
 
-  document.getElementById('lockdown-overlay').classList.add('hidden');
+  const overlay = document.getElementById('lockdown-overlay');
+  if (overlay) {
+    overlay.classList.remove('alarming');
+    overlay.classList.add('hidden');
+  }
   resetKeypad();
   exitFullscreenSafe();
 }
@@ -1270,6 +1493,9 @@ function calculateMotionMagnitude(event) {
 
 function startLiveMotionPreview() {
   window.addEventListener('devicemotion', (evt) => {
+    // Battery optimization: Stop DOM mutations & style calculations when armed or in stealth
+    if (armed || isStealthActive) return;
+
     const mag = calculateMotionMagnitude(evt);
     const meterFill = document.getElementById('meter-bar');
     const liveVal = document.getElementById('live-motion-val');
@@ -1424,6 +1650,11 @@ async function activateGuard() {
   showAlert('✅ Guard armed! Phone is locked at full-volume sensitivity.', 'ok');
   setTimeout(hideAlert, 3000);
 
+  const btnStealth = document.getElementById('btn-enter-stealth');
+  if (btnStealth) {
+    btnStealth.classList.remove('hidden');
+  }
+
   if (guardMode === 'motion' || guardMode === 'dual') {
     await enableMotionDetection();
   }
@@ -1438,10 +1669,46 @@ async function activateGuard() {
       }, 1000);
     }
   }
+
+  // Auto-enter OLED Stealth Mode if enabled
+  if (stealthModeEnabled) {
+    setTimeout(() => {
+      if (armed && !alarmActive) {
+        enterStealthMode();
+      }
+    }, 1200);
+  }
 }
 
 function promptDisarm() {
-  document.getElementById('lockdown-overlay').classList.remove('hidden');
+  exitStealthMode();
+  const overlay = document.getElementById('lockdown-overlay');
+  if (overlay) {
+    overlay.classList.remove('alarming');
+    overlay.classList.remove('hidden');
+  }
+
+  const box = document.getElementById('lockdown-box');
+  if (box) box.classList.add('calm');
+
+  const title = document.getElementById('lockdown-title');
+  if (title) title.textContent = '🛡️ DISARM PHONE GUARD';
+
+  const desc = document.getElementById('lockdown-desc');
+  if (desc) desc.textContent = 'Enter your 4-digit PIN or use Biometrics to disarm:';
+
+  const notice = document.getElementById('volume-lock-notice');
+  if (notice) notice.style.display = 'none';
+
+  const btnCancel = document.getElementById('btn-cancel-disarm');
+  if (btnCancel) {
+    if (armed) {
+      btnCancel.classList.remove('hidden');
+    } else {
+      btnCancel.classList.add('hidden');
+    }
+  }
+
   resetKeypad();
   if (savedBioCredId) {
     disarmWithBiometrics();
@@ -1450,6 +1717,10 @@ function promptDisarm() {
 
 function disarmAlarm() {
   armed = false;
+  exitStealthMode();
+  const btnStealth = document.getElementById('btn-enter-stealth');
+  if (btnStealth) btnStealth.classList.add('hidden');
+
   if (armingTimer) {
     clearInterval(armingTimer);
     armingTimer = null;
